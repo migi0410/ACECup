@@ -146,6 +146,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnRefresh = document.getElementById('btn-refresh');
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', () => {
+            const icon = btnRefresh.querySelector('i');
+            if (icon) {
+                icon.style.animation = 'spin 0.5s linear';
+                setTimeout(() => icon.style.animation = '', 500);
+            }
+            listenToFirebase();
+        });
+    }
+
     function getDbPath() {
         return 'acecup_events/' + (dateInput ? dateInput.value : 'default');
     }
@@ -166,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentDbRef) {
             currentDbRef.off();
         }
+        lastStateString = ''; // Chắc chắn load lại giao diện dù dữ liệu giống nhau
         
         const path = getDbPath();
         currentDbRef = window.firebaseDB.ref(path);

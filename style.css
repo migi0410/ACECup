@@ -793,3 +793,5 @@ tbody tr:hover {
     color: var(--primary);
     margin-bottom: 5px;
 }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
