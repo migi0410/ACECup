@@ -396,9 +396,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     let t1 = pairShuffle[i * 2];
                     let t2 = pairShuffle[i * 2 + 1];
                     
+                    // Chỉ check Nam vs Nam và Nữ vs Nữ để tăng tỉ lệ xếp lịch thành công
                     if (
-                        (pastOpponents[t1.m.id] && (pastOpponents[t1.m.id][t2.m.id] || pastOpponents[t1.m.id][t2.f.id])) ||
-                        (pastOpponents[t1.f.id] && (pastOpponents[t1.f.id][t2.m.id] || pastOpponents[t1.f.id][t2.f.id]))
+                        (pastOpponents[t1.m.id] && pastOpponents[t1.m.id][t2.m.id]) ||
+                        (pastOpponents[t1.f.id] && pastOpponents[t1.f.id][t2.f.id])
                     ) {
                         duplicateOpponent = true;
                         break;
@@ -419,8 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     validMatches = true;
                     for (let match of roundMatches) {
                         markOpponent(match.team1.m.id, match.team2.m.id);
-                        markOpponent(match.team1.m.id, match.team2.f.id);
-                        markOpponent(match.team1.f.id, match.team2.m.id);
                         markOpponent(match.team1.f.id, match.team2.f.id);
                     }
                 }
@@ -441,8 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                     roundMatches.push(match);
                     markOpponent(match.team1.m.id, match.team2.m.id);
-                    markOpponent(match.team1.m.id, match.team2.f.id);
-                    markOpponent(match.team1.f.id, match.team2.m.id);
                     markOpponent(match.team1.f.id, match.team2.f.id);
                 }
             }
