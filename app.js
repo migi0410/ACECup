@@ -55,10 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <option value="F" ${p.gender === 'F' ? 'selected' : ''}>Nữ</option>
                         </select>
                     </div>
-                    <label class="proxy-label" id="p-check-wrap-${i}" style="${p.gender === 'M' ? '' : 'display: none;'}">
-                        <input type="checkbox" id="p-proxy-${i}" ${p.proxy ? 'checked' : ''} onchange="updateActiveCount()">
-                        <span>Tính như Nữ</span>
-                    </label>
                 </div>
             </div>
             <div class="player-active-toggle" title="Tham gia hôm nay">
@@ -82,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (name) {
                     activeCount++;
                     const isM = document.getElementById(`p-gender-${i}`).value === 'M';
-                    const isProxy = document.getElementById(`p-proxy-${i}`).checked;
+                    const isProxy = (name.toLowerCase() === 'minh');
                     if (isM && !isProxy) males++;
                     else females++;
                 }
@@ -214,18 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.updateGenderCheckbox = function(id) {
         const gender = document.getElementById(`p-gender-${id}`).value;
-        const wrap = document.getElementById(`p-check-wrap-${id}`);
-        const proxy = document.getElementById(`p-proxy-${id}`);
         const icon = document.getElementById(`avatar-icon-${id}`);
         const avatarBox = icon.parentElement;
         
         if (gender === 'M') {
-            wrap.style.display = 'flex';
             icon.className = 'ph-fill ph-gender-male';
             avatarBox.className = 'player-avatar m-avatar';
         } else {
-            wrap.style.display = 'none';
-            proxy.checked = false;
             icon.className = 'ph-fill ph-gender-female';
             avatarBox.className = 'player-avatar f-avatar';
         }
@@ -252,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 const gender = document.getElementById(`p-gender-${i}`).value;
-                const isProxy = document.getElementById(`p-proxy-${i}`).checked;
+                const isProxy = (name.toLowerCase() === 'minh');
                 
                 const isLogicalMale = gender === 'M' && !isProxy;
                 if (isLogicalMale) logicalMales++;
