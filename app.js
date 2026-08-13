@@ -421,8 +421,9 @@ document.addEventListener('DOMContentLoaded', () => {
             rBlock.className = 'round-block';
             
             let restingHTML = '';
-            if (roundObj.resting.length > 0) {
-                const tags = roundObj.resting.map(p => `<div class="resting-tag">${getGenderIcon(p)} ${p.name}</div>`).join('');
+            const resting = roundObj.resting || [];
+            if (resting.length > 0) {
+                const tags = resting.map(p => `<div class="resting-tag">${getGenderIcon(p)} ${p.name}</div>`).join('');
                 restingHTML = `
                     <div class="resting-block">
                         <span><i class="ph ph-coffee"></i> Nghỉ vòng này:</span>
@@ -439,7 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${restingHTML}
             `;
             
-            roundObj.matches.forEach(match => {
+            const matches = roundObj.matches || [];
+            matches.forEach(match => {
                 const card = document.createElement('div');
                 card.className = `match-card ${match.isFinished ? 'finished' : ''}`;
                 if (isAnimating) card.classList.add('draw-pending');
