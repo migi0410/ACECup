@@ -145,6 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const today = new Date().toISOString().split('T')[0];
         dateInput.value = today;
         
+        dateInput.addEventListener('change', () => {
+            listenToFirebase();
+        });
+    }
+
     function getDbPath() {
         return 'acecup_events/' + (dateInput ? dateInput.value : 'default');
     }
