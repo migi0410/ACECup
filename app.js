@@ -302,7 +302,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function generateDraw() {
         state.rounds = [];
         state.matches = [];
-        let pastPartners = {}; 
+        let pastPartners = {};
+        let pastOpponents = {};
+        
+        function markOpponent(id1, id2) {
+            if (!pastOpponents[id1]) pastOpponents[id1] = {};
+            if (!pastOpponents[id2]) pastOpponents[id2] = {};
+            pastOpponents[id1][id2] = true;
+            pastOpponents[id2][id1] = true;
+        }
         
         const males = state.players.filter(p => p.logicalGender === 'M');
         const females = state.players.filter(p => p.logicalGender === 'F');
@@ -374,19 +382,71 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            pairs = pairs.sort(() => Math.random() - 0.5);
+            let validMatches = false;
+            let matchAttempts = 200;
             let roundMatches = [];
-            for (let i = 0; i < numMatches; i++) {
-                roundMatches.push({
-                    id: (r - 1) * 10 + i + 1,
-                    round: r,
-                    team1: pairs[i * 2],
-                    team2: pairs[i * 2 + 1],
-                    score1: '',
-                    score2: '',
-                    isFinished: false
-                });
+            
+            while (!validMatches && matchAttempts > 0) {
+                matchAttempts--;
+                let pairShuffle = [...pairs].sort(() => Math.random() - 0.5);
+                let duplicateOpponent = false;
+                roundMatches = [];
+                
+                for (let i = 0; i < numMatches; i++) {
+                    let t1 = pairShuffle[i * 2];
+                    let t2 = pairShuffle[i * 2 + 1];
+                    
+                    if (
+                        (pastOpponents[t1.m.id] && (pastOpponents[t1.m.id][t2.m.id] || pastOpponents[t1.m.id][t2.f.id])) ||
+                        (pastOpponents[t1.f.id] && (pastOpponents[t1.f.id][t2.m.id] || pastOpponents[t1.f.id][t2.f.id]))
+                    ) {
+                        duplicateOpponent = true;
+                        break;
+                    }
+                    
+                    roundMatches.push({
+                        id: (r - 1) * 10 + i + 1,
+                        round: r,
+                        team1: t1,
+                        team2: t2,
+                        score1: '',
+                        score2: '',
+                        isFinished: false
+                    });
+                }
+                
+                if (!duplicateOpponent) {
+                    validMatches = true;
+                    for (let match of roundMatches) {
+                        markOpponent(match.team1.m.id, match.team2.m.id);
+                        markOpponent(match.team1.m.id, match.team2.f.id);
+                        markOpponent(match.team1.f.id, match.team2.m.id);
+                        markOpponent(match.team1.f.id, match.team2.f.id);
+                    }
+                }
             }
+            
+            if (!validMatches) {
+                let pairShuffle = [...pairs].sort(() => Math.random() - 0.5);
+                roundMatches = [];
+                for (let i = 0; i < numMatches; i++) {
+                    let match = {
+                        id: (r - 1) * 10 + i + 1,
+                        round: r,
+                        team1: pairShuffle[i * 2],
+                        team2: pairShuffle[i * 2 + 1],
+                        score1: '',
+                        score2: '',
+                        isFinished: false
+                    };
+                    roundMatches.push(match);
+                    markOpponent(match.team1.m.id, match.team2.m.id);
+                    markOpponent(match.team1.m.id, match.team2.f.id);
+                    markOpponent(match.team1.f.id, match.team2.m.id);
+                    markOpponent(match.team1.f.id, match.team2.f.id);
+                }
+            }
+            
             state.rounds.push({
                 matches: roundMatches,
                 resting: restingThisRound
