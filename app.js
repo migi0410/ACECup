@@ -315,12 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const males = state.players.filter(p => p.logicalGender === 'M');
         const females = state.players.filter(p => p.logicalGender === 'F');
 
-        for (let r = 1; r <= 4; r++) {
-            const maxPairs = Math.min(males.length, females.length);
-            const playingPairs = Math.floor(maxPairs / 2) * 2;
-            const numMatches = playingPairs / 2;
-            
-            if (numMatches === 0) break;
+        const maxPairs = Math.min(males.length, females.length);
+        const playingPairs = Math.floor(maxPairs / 2) * 2;
+        const numMatches = playingPairs / 2;
+        
+        if (numMatches === 0) return;
+        
+        const targetMatches = 12;
+        const totalRounds = Math.ceil(targetMatches / numMatches);
+
+        for (let r = 1; r <= totalRounds; r++) {
 
             let sortedMales = [...males].sort((a, b) => {
                 if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
