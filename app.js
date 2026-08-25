@@ -345,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedMales.forEach(p => p.matchesPlayed++);
             selectedFemales.forEach(p => p.matchesPlayed++);
 
-            let maxAttempts = 200;
+            let maxAttempts = 2000;
             let validPairing = false;
             let pairs = [];
             
@@ -355,35 +355,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 let fShuffle = [...selectedFemales].sort(() => Math.random() - 0.5);
                 
                 pairs = [];
-                let duplicate = false;
+                let hasDuplicatePartner = false;
+                let violatedQuynhRule = false;
+                
                 for (let i = 0; i < playingPairs; i++) {
                     let m = mShuffle[i];
                     let f = fShuffle[i];
+                    
                     if (pastPartners[m.id] && pastPartners[m.id][f.id]) {
-                        duplicate = true;
-                        break;
+                        hasDuplicatePartner = true;
                     }
 
                     const fName = f.name.toLowerCase().trim();
                     const mName = m.name.toLowerCase().trim();
-                    if (fName === "quỳnh") {
-                        if (!["thống", "dũng", "phúc", "nguyên"].includes(mName)) {
-                            duplicate = true;
-                            break;
-                        }
+                    if (fName === "quỳnh" && !["thống", "dũng", "phúc", "nguyên"].includes(mName)) {
+                        violatedQuynhRule = true;
                     }
 
                     pairs.push({ m, f });
                 }
                 
-                if (!duplicate) {
+                // Ưu tiên 1: Hoàn hảo (không trùng lặp, đúng luật Quỳnh)
+                if (!hasDuplicatePartner && !violatedQuynhRule) {
                     validPairing = true;
-                    for (let p of pairs) {
-                        if(!pastPartners[p.m.id]) pastPartners[p.m.id] = {};
-                        if(!pastPartners[p.f.id]) pastPartners[p.f.id] = {};
-                        pastPartners[p.m.id][p.f.id] = true;
-                        pastPartners[p.f.id][p.m.id] = true;
-                    }
+                } 
+                // Ưu tiên 2: Bất đắc dĩ (có thể trùng lặp, nhưng tuyệt đối phải giữ luật Quỳnh)
+                else if (maxAttempts < 500 && !violatedQuynhRule) {
+                    validPairing = true;
                 }
             }
             
@@ -395,28 +393,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     pairs.push({ m: mShuffle[i], f: fShuffle[i] });
                 }
             }
+
+            if (validPairing) {
+                for (let p of pairs) {
+                    if(!pastPartners[p.m.id]) pastPartners[p.m.id] = {};
+                    if(!pastPartners[p.f.id]) pastPartners[p.f.id] = {};
+                    pastPartners[p.m.id][p.f.id] = true;
+                    pastPartners[p.f.id][p.m.id] = true;
+                }
+            }
             
             let validMatches = false;
-            let matchAttempts = 200;
+            let matchAttempts = 500;
             let roundMatches = [];
             
             while (!validMatches && matchAttempts > 0) {
                 matchAttempts--;
                 let pairShuffle = [...pairs].sort(() => Math.random() - 0.5);
                 let duplicateOpponent = false;
+                let violatedQuynhOpponentRule = false;
                 roundMatches = [];
                 
                 for (let i = 0; i < numMatches; i++) {
                     let t1 = pairShuffle[i * 2];
                     let t2 = pairShuffle[i * 2 + 1];
                     
-                    // Chỉ check Nam vs Nam và Nữ vs Nữ để tăng tỉ lệ xếp lịch thành công
                     if (
                         (pastOpponents[t1.m.id] && pastOpponents[t1.m.id][t2.m.id]) ||
                         (pastOpponents[t1.f.id] && pastOpponents[t1.f.id][t2.f.id])
                     ) {
                         duplicateOpponent = true;
-                        break;
                     }
 
                     const t1fName = t1.f.name.toLowerCase().trim();
@@ -428,8 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         (t1fName === "quỳnh" && t2mName === "thống") ||
                         (t2fName === "quỳnh" && t1mName === "thống")
                     ) {
-                        duplicateOpponent = true;
-                        break;
+                        violatedQuynhOpponentRule = true;
                     }
                     
                     roundMatches.push({
@@ -443,12 +448,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 
-                if (!duplicateOpponent) {
+                if (!duplicateOpponent && !violatedQuynhOpponentRule) {
                     validMatches = true;
-                    for (let match of roundMatches) {
-                        markOpponent(match.team1.m.id, match.team2.m.id);
-                        markOpponent(match.team1.f.id, match.team2.f.id);
-                    }
+                } else if (matchAttempts < 100 && !violatedQuynhOpponentRule) {
+                    validMatches = true;
+                }
+            }
+            
+            if (validMatches) {
+                for (let match of roundMatches) {
+                    markOpponent(match.team1.m.id, match.team2.m.id);
+                    markOpponent(match.team1.f.id, match.team2.f.id);
                 }
             }
             
