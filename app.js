@@ -363,6 +363,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         duplicate = true;
                         break;
                     }
+
+                    const fName = f.name.toLowerCase().trim();
+                    const mName = m.name.toLowerCase().trim();
+                    if (fName === "quỳnh") {
+                        if (!["thống", "dũng", "phúc", "nguyên"].includes(mName)) {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+
                     pairs.push({ m, f });
                 }
                 
@@ -404,6 +414,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (
                         (pastOpponents[t1.m.id] && pastOpponents[t1.m.id][t2.m.id]) ||
                         (pastOpponents[t1.f.id] && pastOpponents[t1.f.id][t2.f.id])
+                    ) {
+                        duplicateOpponent = true;
+                        break;
+                    }
+
+                    const t1fName = t1.f.name.toLowerCase().trim();
+                    const t2fName = t2.f.name.toLowerCase().trim();
+                    const t1mName = t1.m.name.toLowerCase().trim();
+                    const t2mName = t2.m.name.toLowerCase().trim();
+
+                    if (
+                        (t1fName === "quỳnh" && t2mName === "thống") ||
+                        (t2fName === "quỳnh" && t1mName === "thống")
                     ) {
                         duplicateOpponent = true;
                         break;
