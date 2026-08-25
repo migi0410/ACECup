@@ -431,8 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const t2mName = t2.m.name.toLowerCase().trim();
 
                     if (
-                        (t1fName === "quỳnh" && t2mName === "thống") ||
-                        (t2fName === "quỳnh" && t1mName === "thống")
+                        (t1fName === "quỳnh" && ["thống", "dũng"].includes(t2mName)) ||
+                        (t2fName === "quỳnh" && ["thống", "dũng"].includes(t1mName))
                     ) {
                         violatedQuynhOpponentRule = true;
                     }
