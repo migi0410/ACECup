@@ -569,9 +569,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="score-dash">-</span>
                                 <input type="number" class="score-input" id="s2-${match.id}" value="${match.score2}" min="0">
                             </div>
-                                <button class="btn-save-score ${controlClass}" onclick="saveMatch(${match.id})" style="${match.isFinished ? 'background: #4ade80; color: #000;' : ''}">
-                                    <i class="ph-bold ${match.isFinished ? 'ph-pencil' : 'ph-check'}"></i> ${match.isFinished ? 'Cập nhật' : 'Lưu điểm'}
+                            <div style="display: flex; gap: 5px; width: 100%;">
+                                <button class="btn-save-score ${controlClass}" onclick="saveMatch(${match.id})" style="flex: 1; justify-content: center; ${match.isFinished ? 'background: #4ade80; color: #000;' : ''}">
+                                    <i class="ph-bold ${match.isFinished ? 'ph-pencil' : 'ph-check'}"></i> ${match.isFinished ? 'Sửa' : 'Lưu'}
                                 </button>
+                                ${match.isFinished ? `
+                                <button class="btn-save-score ${controlClass}" onclick="clearMatchScore(${match.id})" style="flex: 0 0 auto; justify-content: center; padding: 6px 10px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Xóa điểm">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                                ` : ''}
+                            </div>
                         </div>
                         
                         <div class="team-box team-right ${isT2Win ? 'winner' : ''}" id="team2-${match.id}">
@@ -619,6 +626,34 @@ document.addEventListener('DOMContentLoaded', () => {
             saveToFirebase();
         }
     }
+
+    window.clearMatchScore = function(matchId) {
+        if (!confirm('Bạn có chắc chắn muốn xóa điểm trận này?')) return;
+        
+        const match = state.matches.find(m => m.id === matchId);
+        if (!match) return;
+        
+        match.score1 = '';
+        match.score2 = '';
+        match.isFinished = false;
+
+        if (state.rounds) {
+            state.rounds.forEach(r => {
+                if (r.matches) {
+                    const rMatch = r.matches.find(m => m.id === matchId);
+                    if (rMatch) {
+                        rMatch.score1 = '';
+                        rMatch.score2 = '';
+                        rMatch.isFinished = false;
+                    }
+                }
+            });
+        }
+        
+        updateLeaderboard();
+        renderMatches();
+        saveToFirebase();
+    };
 
     window.saveMatch = function(matchId) {
         const match = state.matches.find(m => m.id === matchId);
