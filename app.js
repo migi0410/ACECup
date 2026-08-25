@@ -637,6 +637,20 @@ document.addEventListener('DOMContentLoaded', () => {
         match.score1 = s1;
         match.score2 = s2;
         match.isFinished = true;
+
+        // Cập nhật đồng bộ vào state.rounds vì Firebase tách object reference khi load lại
+        if (state.rounds) {
+            state.rounds.forEach(r => {
+                if (r.matches) {
+                    const rMatch = r.matches.find(m => m.id === matchId);
+                    if (rMatch) {
+                        rMatch.score1 = s1;
+                        rMatch.score2 = s2;
+                        rMatch.isFinished = true;
+                    }
+                }
+            });
+        }
         
         const card = document.getElementById(`match-card-${matchId}`);
         if(card) card.classList.add('finished');
