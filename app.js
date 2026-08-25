@@ -569,11 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="score-dash">-</span>
                                 <input type="number" class="score-input" id="s2-${match.id}" value="${match.score2}" min="0">
                             </div>
-                            ${!match.isFinished ? `
-                                <button class="btn-save-score ${controlClass}" onclick="saveMatch(${match.id})">
-                                    <i class="ph-bold ph-check"></i> Lưu điểm
+                                <button class="btn-save-score ${controlClass}" onclick="saveMatch(${match.id})" style="${match.isFinished ? 'background: #4ade80; color: #000;' : ''}">
+                                    <i class="ph-bold ${match.isFinished ? 'ph-pencil' : 'ph-check'}"></i> ${match.isFinished ? 'Cập nhật' : 'Lưu điểm'}
                                 </button>
-                            ` : `<div class="status-done ${controlClass}"><i class="ph-fill ph-check-circle"></i> Đã xong</div>`}
                         </div>
                         
                         <div class="team-box team-right ${isT2Win ? 'winner' : ''}" id="team2-${match.id}">
@@ -667,6 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         updateLeaderboard();
+        renderMatches();
         saveToFirebase();
     };
 
