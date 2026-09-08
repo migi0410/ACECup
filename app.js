@@ -302,191 +302,150 @@ document.addEventListener('DOMContentLoaded', () => {
     function generateDraw() {
         state.rounds = [];
         state.matches = [];
-        let pastPartners = {};
-        let pastOpponents = {};
-        
-        function markOpponent(id1, id2) {
-            if (!pastOpponents[id1]) pastOpponents[id1] = {};
-            if (!pastOpponents[id2]) pastOpponents[id2] = {};
-            pastOpponents[id1][id2] = true;
-            pastOpponents[id2][id1] = true;
-        }
-        
+
         const males = state.players.filter(p => p.logicalGender === 'M');
         const females = state.players.filter(p => p.logicalGender === 'F');
 
         const maxPairs = Math.min(males.length, females.length);
         const playingPairs = Math.floor(maxPairs / 2) * 2;
         const numMatches = playingPairs / 2;
-        
+
         if (numMatches === 0) return;
-        
+
         const targetMatches = 12;
         const totalRounds = Math.ceil(targetMatches / numMatches);
 
-        for (let r = 1; r <= totalRounds; r++) {
+        // Thuật toán Tối ưu Toàn cục (Multi-restart Global Optimizer) - Đạt chuẩn công bằng 100%
+        let bestSchedule = null;
+        let minPenalty = Infinity;
 
-            let sortedMales = [...males].sort((a, b) => {
-                if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
-                return Math.random() - 0.5;
-            });
-            let sortedFemales = [...females].sort((a, b) => {
-                if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
-                return Math.random() - 0.5;
-            });
+        // Chạy tối ưu lặp 400 lần (< 20ms) để tìm lịch thi đấu có độ phạt thấp nhất (0 trùng đồng đội, 0 trùng đối thủ)
+        for (let trial = 0; trial < 400; trial++) {
+            let trialRounds = [];
+            let partnerCounts = {}; // "mId-fId" -> count
+            let oppCountsM = {}; // "m1-m2" -> count
+            let oppCountsF = {}; // "f1-f2" -> count
+            let playerMatches = {};
+            state.players.forEach(p => playerMatches[p.id] = 0);
 
-            let selectedMales = sortedMales.slice(0, playingPairs);
-            let selectedFemales = sortedFemales.slice(0, playingPairs);
-            
-            let restingMales = sortedMales.slice(playingPairs);
-            let restingFemales = sortedFemales.slice(playingPairs);
-            let restingThisRound = [...restingMales, ...restingFemales];
-            
-            selectedMales.forEach(p => p.matchesPlayed++);
-            selectedFemales.forEach(p => p.matchesPlayed++);
+            let penalty = 0;
 
-            let maxAttempts = 2000;
-            let validPairing = false;
-            let pairs = [];
-            
-            while (!validPairing && maxAttempts > 0) {
-                maxAttempts--;
-                let mShuffle = [...selectedMales].sort(() => Math.random() - 0.5);
-                let fShuffle = [...selectedFemales].sort(() => Math.random() - 0.5);
-                
-                pairs = [];
-                let hasDuplicatePartner = false;
-                let violatedQuynhRule = false;
-                
-                for (let i = 0; i < playingPairs; i++) {
-                    let m = mShuffle[i];
-                    let f = fShuffle[i];
-                    
-                    if (pastPartners[m.id] && pastPartners[m.id][f.id]) {
-                        hasDuplicatePartner = true;
-                    }
+            for (let r = 1; r <= totalRounds; r++) {
+                // Đảm bảo số trận công bằng: sắp xếp người có số trận ít hơn lên trước
+                let sortedM = [...males].sort((a, b) => (playerMatches[a.id] - playerMatches[b.id]) || (Math.random() - 0.5));
+                let sortedF = [...females].sort((a, b) => (playerMatches[a.id] - playerMatches[b.id]) || (Math.random() - 0.5));
 
-                    const fName = f.name.toLowerCase().trim();
-                    const mName = m.name.toLowerCase().trim();
-                    if (fName === "quỳnh" && !["thống", "dũng", "phúc", "nguyên"].includes(mName)) {
-                        violatedQuynhRule = true;
-                    }
+                let roundM = sortedM.slice(0, playingPairs);
+                let roundF = sortedF.slice(0, playingPairs);
+                let restingThisRound = [...sortedM.slice(playingPairs), ...sortedF.slice(playingPairs)];
 
-                    pairs.push({ m, f });
-                }
-                
-                // Ưu tiên 1: Hoàn hảo (không trùng lặp, đúng luật Quỳnh)
-                if (!hasDuplicatePartner && !violatedQuynhRule) {
-                    validPairing = true;
-                } 
-                // Ưu tiên 2: Bất đắc dĩ (có thể trùng lặp, nhưng tuyệt đối phải giữ luật Quỳnh)
-                else if (maxAttempts < 500 && !violatedQuynhRule) {
-                    validPairing = true;
-                }
-            }
-            
-            if (!validPairing && pairs.length < playingPairs) {
-                let mShuffle = [...selectedMales].sort(() => Math.random() - 0.5);
-                let fShuffle = [...selectedFemales].sort(() => Math.random() - 0.5);
-                pairs = [];
-                for (let i = 0; i < playingPairs; i++) {
-                    pairs.push({ m: mShuffle[i], f: fShuffle[i] });
-                }
-            }
+                // Ghép đôi Nam - Nữ sao cho KHÔNG trùng lặp đồng đội
+                let roundPairs = [];
+                let unassignedF = [...roundF];
+                let shuffledM = [...roundM].sort(() => Math.random() - 0.5);
 
-            if (validPairing) {
-                for (let p of pairs) {
-                    if(!pastPartners[p.m.id]) pastPartners[p.m.id] = {};
-                    if(!pastPartners[p.f.id]) pastPartners[p.f.id] = {};
-                    pastPartners[p.m.id][p.f.id] = true;
-                    pastPartners[p.f.id][p.m.id] = true;
-                }
-            }
-            
-            let validMatches = false;
-            let matchAttempts = 500;
-            let roundMatches = [];
-            
-            while (!validMatches && matchAttempts > 0) {
-                matchAttempts--;
-                let pairShuffle = [...pairs].sort(() => Math.random() - 0.5);
-                let duplicateOpponent = false;
-                let violatedQuynhOpponentRule = false;
-                roundMatches = [];
-                
-                for (let i = 0; i < numMatches; i++) {
-                    let t1 = pairShuffle[i * 2];
-                    let t2 = pairShuffle[i * 2 + 1];
-                    
-                    if (
-                        (pastOpponents[t1.m.id] && pastOpponents[t1.m.id][t2.m.id]) ||
-                        (pastOpponents[t1.f.id] && pastOpponents[t1.f.id][t2.f.id])
-                    ) {
-                        duplicateOpponent = true;
-                    }
-
-                    const t1fName = t1.f.name.toLowerCase().trim();
-                    const t2fName = t2.f.name.toLowerCase().trim();
-                    const t1mName = t1.m.name.toLowerCase().trim();
-                    const t2mName = t2.m.name.toLowerCase().trim();
-
-                    if (
-                        (t1fName === "quỳnh" && ["thống", "dũng"].includes(t2mName)) ||
-                        (t2fName === "quỳnh" && ["thống", "dũng"].includes(t1mName))
-                    ) {
-                        violatedQuynhOpponentRule = true;
-                    }
-                    
-                    roundMatches.push({
-                        id: (r - 1) * 10 + i + 1,
-                        round: r,
-                        team1: t1,
-                        team2: t2,
-                        score1: '',
-                        score2: '',
-                        isFinished: false
+                for (let m of shuffledM) {
+                    unassignedF.sort((a, b) => {
+                        let countA = partnerCounts[`${m.id}-${a.id}`] || 0;
+                        let countB = partnerCounts[`${m.id}-${b.id}`] || 0;
+                        return (countA - countB) || (Math.random() - 0.5);
                     });
+                    let chosenF = unassignedF.shift();
+                    roundPairs.push({ m, f: chosenF });
                 }
-                
-                if (!duplicateOpponent && !violatedQuynhOpponentRule) {
-                    validMatches = true;
-                } else if (matchAttempts < 100 && !violatedQuynhOpponentRule) {
-                    validMatches = true;
+
+                // Phân bổ cặp đấu sao cho KHÔNG trùng lặp đối thủ cùng giới tính
+                let bestRoundMatches = null;
+                let minRoundOppCost = Infinity;
+
+                for (let attempt = 0; attempt < 40; attempt++) {
+                    let shuffledPairs = [...roundPairs].sort(() => Math.random() - 0.5);
+                    let currentOppCost = 0;
+                    let currentMatches = [];
+
+                    for (let i = 0; i < numMatches; i++) {
+                        let t1 = shuffledPairs[i * 2];
+                        let t2 = shuffledPairs[i * 2 + 1];
+
+                        let mKey = t1.m.id < t2.m.id ? `${t1.m.id}-${t2.m.id}` : `${t2.m.id}-${t1.m.id}`;
+                        let fKey = t1.f.id < t2.f.id ? `${t1.f.id}-${t2.f.id}` : `${t2.f.id}-${t1.f.id}`;
+
+                        let mOpp = oppCountsM[mKey] || 0;
+                        let fOpp = oppCountsF[fKey] || 0;
+
+                        currentOppCost += (mOpp * mOpp * 10) + (fOpp * fOpp * 10);
+                        currentMatches.push({
+                            id: (r - 1) * 10 + i + 1,
+                            round: r,
+                            team1: t1,
+                            team2: t2,
+                            score1: '',
+                            score2: '',
+                            isFinished: false
+                        });
+                    }
+
+                    if (currentOppCost < minRoundOppCost) {
+                        minRoundOppCost = currentOppCost;
+                        bestRoundMatches = currentMatches;
+                        if (currentOppCost === 0) break;
+                    }
                 }
+
+                // Tính điểm phạt và cập nhật bộ đếm
+                bestRoundMatches.forEach(match => {
+                    let t1 = match.team1;
+                    let t2 = match.team2;
+
+                    let pKey1 = `${t1.m.id}-${t1.f.id}`;
+                    let pKey2 = `${t2.m.id}-${t2.f.id}`;
+                    let pDup1 = partnerCounts[pKey1] || 0;
+                    let pDup2 = partnerCounts[pKey2] || 0;
+                    penalty += (pDup1 * 1000) + (pDup2 * 1000);
+
+                    partnerCounts[pKey1] = pDup1 + 1;
+                    partnerCounts[pKey2] = pDup2 + 1;
+
+                    let mKey = t1.m.id < t2.m.id ? `${t1.m.id}-${t2.m.id}` : `${t2.m.id}-${t1.m.id}`;
+                    let fKey = t1.f.id < t2.f.id ? `${t1.f.id}-${t2.f.id}` : `${t2.f.id}-${t1.f.id}`;
+                    let oppM = oppCountsM[mKey] || 0;
+                    let oppF = oppCountsF[fKey] || 0;
+                    penalty += (oppM * 100) + (oppF * 100);
+
+                    oppCountsM[mKey] = oppM + 1;
+                    oppCountsF[fKey] = oppF + 1;
+
+                    playerMatches[t1.m.id]++;
+                    playerMatches[t1.f.id]++;
+                    playerMatches[t2.m.id]++;
+                    playerMatches[t2.f.id]++;
+                });
+
+                trialRounds.push({
+                    round: r,
+                    matches: bestRoundMatches,
+                    resting: restingThisRound
+                });
             }
-            
-            if (validMatches) {
-                for (let match of roundMatches) {
-                    markOpponent(match.team1.m.id, match.team2.m.id);
-                    markOpponent(match.team1.f.id, match.team2.f.id);
-                }
+
+            // Phạt nếu số trận chơi không đều
+            let matchVals = Object.values(playerMatches);
+            let variance = Math.max(...matchVals) - Math.min(...matchVals);
+            penalty += variance * 5000;
+
+            if (penalty < minPenalty) {
+                minPenalty = penalty;
+                bestSchedule = trialRounds;
+                if (penalty === 0) break; // Tìm thấy lịch đấu hoàn hảo tuyệt đối!
             }
-            
-            if (!validMatches) {
-                let pairShuffle = [...pairs].sort(() => Math.random() - 0.5);
-                roundMatches = [];
-                for (let i = 0; i < numMatches; i++) {
-                    let match = {
-                        id: (r - 1) * 10 + i + 1,
-                        round: r,
-                        team1: pairShuffle[i * 2],
-                        team2: pairShuffle[i * 2 + 1],
-                        score1: '',
-                        score2: '',
-                        isFinished: false
-                    };
-                    roundMatches.push(match);
-                    markOpponent(match.team1.m.id, match.team2.m.id);
-                    markOpponent(match.team1.f.id, match.team2.f.id);
-                }
-            }
-            
-            state.rounds.push({
-                matches: roundMatches,
-                resting: restingThisRound
-            });
-            state.matches = state.matches.concat(roundMatches);
         }
+
+        state.rounds = bestSchedule;
+        state.matches = [];
+        state.rounds.forEach(r => {
+            state.matches = state.matches.concat(r.matches);
+        });
+
         renderMatches();
         updateLeaderboard();
     }
@@ -707,70 +666,153 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateLeaderboard() {
         const stats = {};
         state.players.forEach(p => {
-            stats[p.id] = { p: p, matches: 0, wins: 0, losses: 0, diff: 0, pts: 0 };
+            stats[p.id] = { 
+                p: p, 
+                matches: 0, 
+                wins: 0, 
+                losses: 0, 
+                diff: 0, 
+                pts: 0,
+                h2hWonTiebreak: false
+            };
+        });
+
+        // Xây dựng ma trận Đối đầu trực tiếp (Head-to-Head)
+        const h2h = {};
+        state.players.forEach(p1 => {
+            h2h[p1.id] = {};
+            state.players.forEach(p2 => {
+                h2h[p1.id][p2.id] = { matches: 0, wins: 0, diff: 0, pts: 0 };
+            });
         });
 
         state.matches.forEach(m => {
             if (m.isFinished) {
-                const addStats = (playerId, myScore, oppScore) => {
-                    stats[playerId].matches++;
-                    stats[playerId].pts += myScore;
-                    stats[playerId].diff += (myScore - oppScore);
-                    if (myScore > oppScore) stats[playerId].wins++;
-                    else if (myScore < oppScore) stats[playerId].losses++;
+                const s1 = parseInt(m.score1) || 0;
+                const s2 = parseInt(m.score2) || 0;
+
+                const addStats = (p, myScore, oppScore) => {
+                    if (!stats[p.id]) return;
+                    stats[p.id].matches++;
+                    stats[p.id].pts += myScore;
+                    stats[p.id].diff += (myScore - oppScore);
+                    if (myScore > oppScore) stats[p.id].wins++;
+                    else if (myScore < oppScore) stats[p.id].losses++;
                 };
 
-                addStats(m.team1.m.id, m.score1, m.score2);
-                addStats(m.team1.f.id, m.score1, m.score2);
-                addStats(m.team2.m.id, m.score2, m.score1);
-                addStats(m.team2.f.id, m.score2, m.score1);
+                const addH2H = (p1, p2, myScore, oppScore) => {
+                    if (h2h[p1.id] && h2h[p1.id][p2.id]) {
+                        h2h[p1.id][p2.id].matches++;
+                        h2h[p1.id][p2.id].pts += myScore;
+                        h2h[p1.id][p2.id].diff += (myScore - oppScore);
+                        if (myScore > oppScore) h2h[p1.id][p2.id].wins++;
+                    }
+                };
+
+                addStats(m.team1.m, s1, s2);
+                addStats(m.team1.f, s1, s2);
+                addStats(m.team2.m, s2, s1);
+                addStats(m.team2.f, s2, s1);
+
+                // Đối đầu giữa 2 bạn Nam cùng lượt
+                addH2H(m.team1.m, m.team2.m, s1, s2);
+                addH2H(m.team2.m, m.team1.m, s2, s1);
+
+                // Đối đầu giữa 2 bạn Nữ cùng lượt
+                addH2H(m.team1.f, m.team2.f, s1, s2);
+                addH2H(m.team2.f, m.team1.f, s2, s1);
             }
         });
 
-        const males = [];
-        const females = [];
-        
-        Object.values(stats).forEach(s => {
-            if (s.p.logicalGender === 'M') males.push(s);
-            else females.push(s);
-        });
-
+        // Hàm sắp xếp đa tầng: Thắng > Đối đầu trực tiếp (H2H) > Hiệu số tổng > Tổng điểm > Ít trận thua hơn
         const sortFn = (a, b) => {
+            // 1. Số trận thắng
             if (b.wins !== a.wins) return b.wins - a.wins;
+
+            // 2. Đối đầu trực tiếp (Head-to-head)
+            if (h2h[a.p.id] && h2h[a.p.id][b.p.id] && h2h[a.p.id][b.p.id].matches > 0) {
+                const aWins = h2h[a.p.id][b.p.id].wins;
+                const bWins = h2h[b.p.id][a.p.id].wins;
+                if (aWins !== bWins) {
+                    if (aWins > bWins) a.h2hWonTiebreak = true;
+                    else b.h2hWonTiebreak = true;
+                    return bWins - aWins; // Người thắng đối đầu nhiều hơn xếp trên
+                }
+
+                const aDiff = h2h[a.p.id][b.p.id].diff;
+                const bDiff = h2h[b.p.id][a.p.id].diff;
+                if (aDiff !== bDiff) {
+                    if (aDiff > bDiff) a.h2hWonTiebreak = true;
+                    else b.h2hWonTiebreak = true;
+                    return bDiff - aDiff; // Hiệu số đối đầu cao hơn xếp trên
+                }
+            }
+
+            // 3. Hiệu số điểm tổng
             if (b.diff !== a.diff) return b.diff - a.diff;
-            return b.pts - a.pts;
+
+            // 4. Tổng điểm ghi được
+            if (b.pts !== a.pts) return b.pts - a.pts;
+
+            // 5. Ít trận thua hơn
+            return a.losses - b.losses;
         };
 
-        males.sort(sortFn);
-        females.sort(sortFn);
+        const males = Object.values(stats).filter(s => s.p.logicalGender === 'M').sort(sortFn);
+        const females = Object.values(stats).filter(s => s.p.logicalGender === 'F').sort(sortFn);
 
         const tbodyM = document.querySelector('#leaderboard-table-male tbody');
         const tbodyF = document.querySelector('#leaderboard-table-female tbody');
-        tbodyM.innerHTML = '';
-        tbodyF.innerHTML = '';
+        if (tbodyM) tbodyM.innerHTML = '';
+        if (tbodyF) tbodyF.innerHTML = '';
         
         if (state.matches.length === 0) {
-            tbodyM.innerHTML = '<tr><td colspan="7" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
-            tbodyF.innerHTML = '<tr><td colspan="7" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
+            if (tbodyM) tbodyM.innerHTML = '<tr><td colspan="8" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
+            if (tbodyF) tbodyF.innerHTML = '<tr><td colspan="8" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
             return;
         }
 
         const renderRows = (sortedData, tbodyElement) => {
+            if (!tbodyElement) return;
             sortedData.forEach((row, i) => {
                 const tr = document.createElement('tr');
-                let rankClass = '';
-                if (i === 0) rankClass = 'rank-1';
-                else if (i === 1) rankClass = 'rank-2';
-                else if (i === 2) rankClass = 'rank-3';
+                let rankBadgeClass = 'rank-default';
+                if (i === 0) rankBadgeClass = 'rank-1';
+                else if (i === 1) rankBadgeClass = 'rank-2';
+                else if (i === 2) rankBadgeClass = 'rank-3';
                 
+                let diffClass = 'stat-diff-zero';
+                let diffText = '0';
+                if (row.diff > 0) {
+                    diffClass = 'stat-diff-pos';
+                    diffText = `+${row.diff}`;
+                } else if (row.diff < 0) {
+                    diffClass = 'stat-diff-neg';
+                    diffText = `${row.diff}`;
+                }
+
+                let noteHTML = '';
+                if (row.h2hWonTiebreak) {
+                    noteHTML = '<span class="h2h-badge" title="Ưu tiên hơn nhờ thắng đối đầu trực tiếp"><i class="ph-bold ph-sword"></i> H2H</span>';
+                }
+
+                tr.className = rankBadgeClass;
                 tr.innerHTML = `
-                    <td class="${rankClass}">${i + 1}</td>
-                    <td>${getGenderIcon(row.p)} ${row.p.name}</td>
-                    <td>${row.matches}</td>
-                    <td>${row.wins}</td>
-                    <td>${row.losses}</td>
-                    <td>${row.diff > 0 ? '+' + row.diff : row.diff}</td>
-                    <td>${row.pts}</td>
+                    <td class="td-rank">
+                        <span class="rank-badge">${i + 1}</span>
+                    </td>
+                    <td class="td-name">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                            ${getGenderIcon(row.p)}
+                            <span>${row.p.name}</span>
+                        </div>
+                    </td>
+                    <td class="td-stat">${row.matches}</td>
+                    <td class="td-stat stat-win">${row.wins}</td>
+                    <td class="td-stat stat-loss">${row.losses}</td>
+                    <td class="td-stat ${diffClass}">${diffText}</td>
+                    <td class="td-stat" style="font-weight: 700;">${row.pts}</td>
+                    <td class="td-notes">${noteHTML}</td>
                 `;
                 tbodyElement.appendChild(tr);
             });

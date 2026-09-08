@@ -1,17 +1,22 @@
 :root {
-    --bg-color: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
+    --bg-color: #0b0f19;
+    --card-bg: rgba(22, 30, 49, 0.75);
+    --card-border: rgba(255, 255, 255, 0.08);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
-    --primary: #3b82f6;
-    --primary-hover: #2563eb;
-    --secondary: #8b5cf6;
-    --danger: #ef4444;
-    --danger-hover: #dc2828;
+    --primary: #38bdf8;
+    --primary-glow: rgba(56, 189, 248, 0.35);
+    --secondary: #818cf8;
+    --secondary-glow: rgba(129, 140, 248, 0.35);
+    --accent-male: #38bdf8;
+    --accent-female: #f472b6;
+    --danger: #f43f5e;
+    --danger-hover: #e11d48;
     --success: #10b981;
-    --border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    --glass-blur: blur(12px);
+    --success-glow: rgba(16, 185, 129, 0.35);
+    --border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --glass-blur: blur(16px);
 }
 
 * {
@@ -21,42 +26,118 @@
 }
 
 body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-color);
-    background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-                      radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+    background-image: 
+        radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.12), transparent 30%),
+        radial-gradient(circle at 90% 25%, rgba(129, 140, 248, 0.12), transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(244, 114, 182, 0.08), transparent 40%);
+    background-attachment: fixed;
     color: var(--text-main);
     min-height: 100vh;
-    padding: 20px;
+    padding: 24px 16px;
+    -webkit-font-smoothing: antialiased;
 }
 
 .app-container {
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
 }
 
+/* Header */
 header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-top: 20px;
+    margin-bottom: 24px;
 }
 
-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    background: linear-gradient(to right, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-logo {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    font-size: 1.6rem;
+    color: #fff;
+    box-shadow: 0 4px 20px var(--primary-glow);
 }
 
-header p {
+.brand h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+}
+
+.brand-tagline {
     color: var(--text-muted);
-    margin-top: 5px;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.date-selector-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.date-selector-card i {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.date-selector-card input[type="date"] {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+
+.date-selector-card button {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.date-selector-card button:hover {
+    background: var(--primary);
+    color: #0b0f19;
+    transform: rotate(180deg);
 }
 
 .tabs {
@@ -606,45 +687,171 @@ button.success-btn:hover {
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
 }
 
-/* Leaderboard */
+/* Leaderboard Modern */
+.ranking-rule-banner {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 12px 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    color: #bae6fd;
+}
+
+.ranking-rule-banner i {
+    font-size: 1.5rem;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.rule-text {
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.rule-text strong {
+    color: #fff;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.male-title {
+    color: var(--accent-male);
+}
+
+.female-title {
+    color: var(--accent-female);
+}
+
 .table-responsive {
     overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(15, 23, 42, 0.4);
 }
 
-table {
+.leaderboard-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    font-size: 0.95rem;
 }
 
-th, td {
-    padding: 15px;
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 12px 14px;
     text-align: left;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-th {
+.leaderboard-table th {
+    background: rgba(0, 0, 0, 0.35);
     color: var(--text-muted);
-    font-weight: 600;
-    background: rgba(0, 0, 0, 0.2);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     white-space: nowrap;
 }
 
-td {
-    color: var(--text-main);
+.th-rank { width: 65px; text-align: center !important; }
+.th-name { min-width: 150px; }
+.th-stat { width: 70px; text-align: center !important; }
+.th-notes { width: 110px; text-align: center !important; }
+
+.leaderboard-table td.td-rank,
+.leaderboard-table td.td-stat,
+.leaderboard-table td.td-notes {
+    text-align: center;
 }
 
-tbody tr {
-    transition: background 0.2s;
+.leaderboard-table tbody tr {
+    transition: background 0.2s ease;
 }
 
-tbody tr:hover {
+.leaderboard-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Podium Rank Badges */
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.rank-1 .rank-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #0b0f19;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+.rank-2 .rank-badge {
+    background: linear-gradient(135deg, #cbd5e1, #64748b);
+    color: #0b0f19;
+    box-shadow: 0 0 10px rgba(203, 213, 225, 0.4);
+}
+
+.rank-3 .rank-badge {
+    background: linear-gradient(135deg, #d97706, #78350f);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(217, 119, 6, 0.4);
+}
+
+.rank-default .rank-badge {
     background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
 }
 
-.rank-1 { color: #fbbf24; font-weight: 700; }
-.rank-2 { color: #94a3b8; font-weight: 700; }
-.rank-3 { color: #b45309; font-weight: 700; }
+.stat-win {
+    color: #34d399;
+    font-weight: 700;
+}
+
+.stat-loss {
+    color: var(--text-muted);
+}
+
+.stat-diff-pos {
+    color: #38bdf8;
+    font-weight: 700;
+}
+
+.stat-diff-neg {
+    color: #fb7185;
+    font-weight: 700;
+}
+
+.stat-diff-zero {
+    color: var(--text-muted);
+}
+
+.h2h-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(56, 189, 248, 0.15);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
 
 .text-center {
     text-align: center;
