@@ -1198,6 +1198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = 'hidden';
         }
     }
+    window.openLightbox = openLightbox;
 
     function closeLightbox() {
         if (lightboxModal) {
@@ -1205,6 +1206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = '';
         }
     }
+    window.closeLightbox = closeLightbox;
 
     function nextLightboxPhoto() {
         openLightbox((currentPhotoIndex + 1) % tournamentPhotos.length);
@@ -1231,82 +1233,36 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (e.key === 'ArrowLeft') prevLightboxPhoto();
     });
 
-    // Hero Image Card Click
-    const heroImgCard = document.getElementById('hero-img-card');
-    if (heroImgCard) {
-        heroImgCard.addEventListener('click', () => {
-            openLightbox(1); // photo_2.jpg
-        });
-    }
-
-    // Podium Preview Image Click
-    const podiumImgPreview = document.getElementById('podium-img-preview');
-    if (podiumImgPreview) {
-        podiumImgPreview.addEventListener('click', () => {
-            openLightbox(8); // photo_9.jpg
-        });
-    }
-
-    // Render Gallery
-    const galleryGrid = document.getElementById('gallery-grid');
-    const galleryFilterBtns = document.querySelectorAll('.gallery-filter-btn');
-
-    function renderGallery(filter = 'all') {
-        if (!galleryGrid) return;
-        galleryGrid.innerHTML = '';
-
-        const filtered = filter === 'all' 
-            ? tournamentPhotos 
-            : tournamentPhotos.filter(p => p.category === filter);
-
-        filtered.forEach((photo) => {
-            const originalIndex = tournamentPhotos.findIndex(p => p.id === photo.id);
-            const card = document.createElement('div');
-            card.className = 'gallery-card';
-            card.setAttribute('data-category', photo.category);
-            
-            card.innerHTML = `
-                <div class="gallery-card-thumb-wrap">
-                    <span class="gallery-category-pill ${photo.category}">
-                        <i class="ph-fill ${photo.category === 'awards' ? 'ph-trophy' : (photo.category === 'court' ? 'ph-tennis-ball' : 'ph-sparkle')}"></i>
-                        ${photo.categoryName}
-                    </span>
-                    <img src="${photo.src}" alt="${photo.title}" class="gallery-card-thumb" loading="lazy">
-                    <div class="gallery-card-overlay">
-                        <div class="gallery-expand-icon">
-                            <i class="ph-bold ph-arrows-out-simple"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="gallery-card-body">
-                    <h4 class="gallery-card-title">${photo.title}</h4>
-                    <p class="gallery-card-desc">${photo.desc}</p>
-                </div>
-            `;
-
-            card.addEventListener('click', () => {
-                openLightbox(originalIndex);
-            });
-
-            galleryGrid.appendChild(card);
-        });
-
-        // Update badge count
-        const countBadge = document.getElementById('gallery-count-badge');
-        if (countBadge) {
-            countBadge.textContent = `${filtered.length} khoảnh khắc`;
+    // Global click listener for any .clickable-photo element on the site
+    document.addEventListener('click', (e) => {
+        const clickable = e.target.closest('.clickable-photo');
+        if (clickable && clickable.dataset.photoIdx !== undefined) {
+            const idx = parseInt(clickable.dataset.photoIdx, 10);
+            if (!isNaN(idx)) openLightbox(idx);
         }
-    }
-
-    galleryFilterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            galleryFilterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderGallery(btn.dataset.filter);
-        });
     });
 
-    // Initial render of gallery
-    renderGallery('all');
+    // Populate Global Tournament Photo Ticker Ribbon
+    function renderPhotoTicker() {
+        const ticker = document.getElementById('photo-ticker-track');
+        if (!ticker) return;
+        ticker.innerHTML = '';
+        tournamentPhotos.forEach((photo, idx) => {
+            const item = document.createElement('div');
+            item.className = 'ticker-item clickable-photo';
+            item.setAttribute('data-photo-idx', idx);
+            item.title = photo.title;
+            item.innerHTML = `
+                <img src="${photo.src}" alt="${photo.title}" loading="lazy">
+                <div class="ticker-item-badge">
+                    <i class="ph-fill ${photo.category === 'awards' ? 'ph-trophy' : (photo.category === 'court' ? 'ph-tennis-ball' : 'ph-sparkle')}"></i>
+                    <span>${photo.categoryName}</span>
+                </div>
+            `;
+            ticker.appendChild(item);
+        });
+    }
+
+    renderPhotoTicker();
 });
 

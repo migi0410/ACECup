@@ -1566,272 +1566,455 @@ input:checked + .slider:before {
 }
 
 /* ==========================================================================
-   PODIUM SPOTLIGHT BANNER (LEADERBOARD)
+   GLOBAL CLICKABLE PHOTO HOVER EFFECT
    ========================================================================== */
-.podium-spotlight-card {
-    margin: 20px 0;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
-    border: 1px solid rgba(250, 204, 21, 0.25);
+.clickable-photo {
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.clickable-photo:hover {
+    transform: translateY(-4px);
+}
+
+.photo-overlay-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(11, 15, 25, 0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 2;
+}
+
+.photo-overlay-tag.awards { color: #fde047; border-color: rgba(250, 204, 21, 0.4); }
+.photo-overlay-tag.court { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+.photo-overlay-tag.fun { color: #f472b6; border-color: rgba(244, 114, 182, 0.4); }
+
+/* ==========================================================================
+   GLOBAL PHOTO TICKER RIBBON (ACROSS SITE)
+   ========================================================================== */
+.photo-ticker-container {
+    margin-bottom: 20px;
+    background: rgba(22, 30, 49, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
     border-radius: 16px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(250, 204, 21, 0.08);
+    padding: 12px 14px;
 }
 
-.podium-banner-media {
+.photo-ticker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 4px;
+}
+
+.ticker-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+}
+
+.ticker-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.photo-ticker-track {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(56, 189, 248, 0.4) transparent;
+}
+
+.photo-ticker-track::-webkit-scrollbar {
+    height: 6px;
+}
+
+.photo-ticker-track::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.3);
+    border-radius: 6px;
+}
+
+.ticker-item {
+    flex: 0 0 160px;
+    height: 110px;
     position: relative;
-    height: 100%;
-    min-height: 140px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.podium-banner-media img {
+.ticker-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    cursor: pointer;
     transition: transform 0.4s ease;
 }
 
-.podium-spotlight-card:hover .podium-banner-media img {
-    transform: scale(1.05);
-}
-
-.podium-banner-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, transparent 50%, rgba(15, 23, 42, 0.8) 100%);
-}
-
-.podium-banner-info {
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 8px;
-}
-
-.podium-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(250, 204, 21, 0.15);
-    color: #fde047;
-    border: 1px solid rgba(250, 204, 21, 0.35);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    width: fit-content;
-}
-
-.podium-banner-info h3 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.podium-banner-info p {
-    color: var(--text-muted);
-    font-size: 0.88rem;
-    line-height: 1.4;
-}
-
-.btn-view-gallery-link {
-    background: rgba(56, 189, 248, 0.12);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    color: var(--primary);
-    padding: 7px 14px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    width: fit-content;
-    margin-top: 4px;
-    transition: all 0.2s ease;
-}
-
-.btn-view-gallery-link:hover {
-    background: rgba(56, 189, 248, 0.25);
+.ticker-item:hover {
+    transform: translateY(-4px) scale(1.03);
     border-color: var(--primary);
-    transform: translateX(4px);
+    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+}
+
+.ticker-item:hover img {
+    transform: scale(1.1);
+}
+
+.ticker-item-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+    background: rgba(11, 15, 25, 0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* ==========================================================================
-   GALLERY TAB & PHOTO GRID
+   TAB PHOTO DUO (PLAYERS & MATCHES TAB)
    ========================================================================== */
-.gallery-filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    scrollbar-width: thin;
-}
-
-.gallery-filter-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-muted);
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.gallery-filter-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-main);
-}
-
-.gallery-filter-btn.active {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 4px 14px var(--primary-glow);
-}
-
-.gallery-grid {
+.tab-photo-duo {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-    gap: 18px;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
 }
 
-.gallery-card {
+.inline-photo-card {
     position: relative;
-    border-radius: 16px;
+    border-radius: 14px;
     overflow: hidden;
     background: rgba(15, 23, 42, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    cursor: pointer;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-.gallery-card:hover {
-    transform: translateY(-6px);
+.inline-photo-card:hover {
     border-color: rgba(56, 189, 248, 0.4);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 10px 28px rgba(56, 189, 248, 0.2);
 }
 
-.gallery-card-thumb-wrap {
+.inline-photo-wrap {
     position: relative;
     width: 100%;
-    height: 240px;
+    height: 170px;
     overflow: hidden;
-    background: #0b0f19;
 }
 
-.gallery-card-thumb {
+.inline-photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+    transition: transform 0.45s ease;
+}
+
+.inline-photo-card:hover .inline-photo-wrap img {
+    transform: scale(1.08);
+}
+
+.inline-photo-caption {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.inline-photo-caption strong {
+    font-size: 0.88rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.inline-photo-caption span {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   MOTIVATIONAL BANNER (BEFORE DRAW BUTTON)
+   ========================================================================== */
+.draw-motivational-banner {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 16px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 18px 0;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 16px rgba(250, 204, 21, 0.06);
+}
+
+.draw-motivational-banner:hover {
+    border-color: rgba(250, 204, 21, 0.5);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 24px rgba(250, 204, 21, 0.15);
+}
+
+.moti-img-wrap {
+    position: relative;
+    height: 100%;
+    min-height: 110px;
+}
+
+.moti-img-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center 20%;
-    transition: transform 0.5s ease;
+    transition: transform 0.4s ease;
 }
 
-.gallery-card:hover .gallery-card-thumb {
+.draw-motivational-banner:hover .moti-img-wrap img {
     transform: scale(1.08);
 }
 
-.gallery-category-pill {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(11, 15, 25, 0.8);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #fff;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    z-index: 2;
-}
-
-.gallery-category-pill.awards { color: #fde047; border-color: rgba(250, 204, 21, 0.4); }
-.gallery-category-pill.court { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
-.gallery-category-pill.fun { color: #f472b6; border-color: rgba(244, 114, 182, 0.4); }
-
-.gallery-card-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.3) 50%, transparent 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 1;
-}
-
-.gallery-card:hover .gallery-card-overlay {
-    opacity: 1;
-}
-
-.gallery-expand-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(56, 189, 248, 0.85);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.6);
-    transform: scale(0.8);
-    transition: transform 0.25s ease;
-}
-
-.gallery-card:hover .gallery-expand-icon {
-    transform: scale(1);
-}
-
-.gallery-card-body {
-    padding: 12px 14px;
+.moti-content {
+    padding: 12px 16px 12px 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    flex: 1;
 }
 
-.gallery-card-title {
-    font-size: 0.95rem;
+.moti-content h3 {
+    font-size: 1.05rem;
     font-weight: 700;
     color: #fff;
-    line-height: 1.35;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    background: linear-gradient(135deg, #fff 40%, #fde047 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.moti-content p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   TOP 3 PODIUM PHOTO SHOWCASE (LEADERBOARD)
+   ========================================================================== */
+.podium-showcase-trio {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 14px;
+    margin: 20px 0;
+    align-items: stretch;
+}
+
+.podium-trio-card {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.podium-trio-card.featured {
+    border-color: rgba(250, 204, 21, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(250, 204, 21, 0.12);
+    transform: translateY(-4px);
+}
+
+.podium-trio-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 12px 30px rgba(56, 189, 248, 0.25);
+}
+
+.podium-trio-card.featured:hover {
+    border-color: #facc15;
+    box-shadow: 0 14px 34px rgba(250, 204, 21, 0.3);
+}
+
+.podium-trio-thumb {
+    position: relative;
+    width: 100%;
+    height: 160px;
     overflow: hidden;
 }
 
-.gallery-card-desc {
-    font-size: 0.8rem;
+.podium-trio-card.featured .podium-trio-thumb {
+    height: 175px;
+}
+
+.podium-trio-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    transition: transform 0.45s ease;
+}
+
+.podium-trio-card:hover .podium-trio-thumb img {
+    transform: scale(1.08);
+}
+
+.podium-tag {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    backdrop-filter: blur(8px);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.podium-tag.gold {
+    background: rgba(234, 179, 8, 0.25);
+    border: 1px solid rgba(250, 204, 21, 0.6);
+    color: #fef08a;
+}
+
+.podium-tag.silver {
+    background: rgba(148, 163, 184, 0.25);
+    border: 1px solid rgba(203, 213, 225, 0.6);
+    color: #f8fafc;
+}
+
+.podium-tag.bronze {
+    background: rgba(217, 119, 6, 0.25);
+    border: 1px solid rgba(245, 158, 11, 0.6);
+    color: #fed7aa;
+}
+
+.podium-trio-info {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.podium-trio-info strong {
+    font-size: 0.88rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.podium-trio-info span {
+    font-size: 0.76rem;
     color: var(--text-muted);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+}
+
+/* ==========================================================================
+   TOURNAMENT MEMORIES STRIP (LEADERBOARD BOTTOM)
+   ========================================================================== */
+.tournament-memories-card {
+    margin-top: 36px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.memories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.memories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.memory-item {
+    position: relative;
+    border-radius: 12px;
     overflow: hidden;
+    background: rgba(11, 15, 25, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.memory-item:hover {
+    border-color: rgba(244, 114, 182, 0.4);
+    box-shadow: 0 10px 24px rgba(244, 114, 182, 0.15);
+}
+
+.memory-thumb {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+}
+
+.memory-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+}
+
+.memory-item:hover .memory-thumb img {
+    transform: scale(1.08);
+}
+
+.memory-info {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.memory-info strong {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+}
+
+.memory-info span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
 /* ==========================================================================
@@ -2121,21 +2304,39 @@ input:checked + .slider:before {
         height: 180px;
     }
 
-    .podium-spotlight-card {
+    .tab-photo-duo {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .inline-photo-wrap {
+        height: 180px;
+    }
+
+    .draw-motivational-banner {
         grid-template-columns: 1fr;
     }
 
-    .podium-banner-media {
-        height: 160px;
+    .moti-img-wrap {
+        height: 140px;
     }
 
-    .gallery-grid {
+    .moti-content {
+        padding: 0 14px 14px 14px;
+    }
+
+    .podium-showcase-trio {
         grid-template-columns: 1fr;
         gap: 14px;
     }
 
-    .gallery-card-thumb-wrap {
-        height: 220px;
+    .podium-trio-card.featured {
+        transform: none;
+    }
+
+    .memories-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .lightbox-nav-btn {
