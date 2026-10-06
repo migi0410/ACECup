@@ -17,7 +17,13 @@
                         <i class="ph-fill ph-trophy"></i>
                     </div>
                     <div>
-                        <h1>ACE Cup</h1>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h1>ACE Cup</h1>
+                            <div id="db-status-pill" class="db-status-pill online" title="Kiểm tra trạng thái kết nối Cloud Database">
+                                <span class="status-dot"></span>
+                                <span id="db-status-text">Đang kết nối</span>
+                            </div>
+                        </div>
                         <p class="brand-tagline">Giải Cầu Lông Đôi Nam Nữ Giao Lưu</p>
                     </div>
                 </div>
@@ -46,7 +52,13 @@
                             <h2>Danh sách Vận Động Viên</h2>
                             <p class="subtitle">Bốc thăm tự động phân bổ đồng đội &amp; đối thủ công bằng 100%.</p>
                         </div>
-                        <span class="badge" id="player-count-badge">0 VĐV tham gia</span>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <span class="badge" id="player-count-badge">0 VĐV tham gia</span>
+                            <div class="player-quick-tools">
+                                <button id="btn-select-all" class="mini-tool-btn" title="Chọn tất cả tham gia"><i class="ph-bold ph-checks"></i> Chọn hết</button>
+                                <button id="btn-deselect-all" class="mini-tool-btn" title="Bỏ chọn tất cả"><i class="ph-bold ph-x"></i> Bỏ hết</button>
+                            </div>
+                        </div>
                     </div>
                     
                     <div id="players-list">
@@ -72,7 +84,7 @@
                     <div class="card-header">
                         <div>
                             <h2>Lịch Thi Đấu</h2>
-                            <p class="subtitle">Nhập điểm từng ván - Hệ thống tự động cập nhật Bảng xếp hạng</p>
+                            <p class="subtitle">Nhập điểm từng ván - Bảng xếp hạng cập nhật tự động tức thì</p>
                         </div>
                         <button id="btn-reset-draw" class="danger-btn"><i class="ph-bold ph-arrow-counter-clockwise"></i> Hủy bốc thăm</button>
                     </div>
@@ -95,6 +107,38 @@
                         </div>
                     </div>
 
+                    <!-- Tournament Stats Overview -->
+                    <div class="stats-overview-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="ph-fill ph-tennis-ball"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Tổng số trận</span>
+                                <strong class="stat-val" id="stat-total-matches">0</strong>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="ph-fill ph-check-circle"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Đã hoàn tất</span>
+                                <strong class="stat-val" id="stat-finished-matches">0</strong>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="ph-fill ph-hourglass-high"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Đang chờ đấu</span>
+                                <strong class="stat-val" id="stat-pending-matches">0</strong>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple"><i class="ph-fill ph-crown"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Dẫn đầu (Nam • Nữ)</span>
+                                <strong class="stat-val" id="stat-top-players" style="font-size: 0.95rem;">-</strong>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="ranking-rule-banner">
                         <i class="ph-fill ph-scales"></i>
                         <div class="rule-text">
@@ -102,7 +146,14 @@
                         </div>
                     </div>
 
-                    <div class="leaderboard-section">
+                    <!-- Sub-tabs for filtering Male / Female on mobile -->
+                    <div class="leaderboard-filter-tabs">
+                        <button class="filter-tab-btn active" data-filter="all"><i class="ph-bold ph-rows"></i> Xem tất cả</button>
+                        <button class="filter-tab-btn" data-filter="male"><i class="ph-fill ph-gender-male"></i> Bảng Nam</button>
+                        <button class="filter-tab-btn" data-filter="female"><i class="ph-fill ph-gender-female"></i> Bảng Nữ</button>
+                    </div>
+
+                    <div class="leaderboard-section" id="section-table-male">
                         <div class="section-title male-title">
                             <i class="ph-fill ph-gender-male"></i>
                             <span>Bảng Xếp Hạng Nam</span>
@@ -128,7 +179,7 @@
                         </div>
                     </div>
 
-                    <div class="leaderboard-section" style="margin-top: 30px;">
+                    <div class="leaderboard-section" id="section-table-female" style="margin-top: 30px;">
                         <div class="section-title female-title">
                             <i class="ph-fill ph-gender-female"></i>
                             <span>Bảng Xếp Hạng Nữ</span>
@@ -158,6 +209,24 @@
         </main>
     </div>
 
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content confirm-modal-box">
+            <div class="confirm-icon-wrap" id="confirm-icon-wrap">
+                <i class="ph-bold ph-warning"></i>
+            </div>
+            <h3 id="confirm-title">Xác nhận</h3>
+            <p id="confirm-msg" style="margin: 10px 0 20px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;"></p>
+            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="btn-cancel-confirm" class="secondary-btn" style="flex: 1;">Hủy bỏ</button>
+                <button id="btn-ok-confirm" class="danger-btn" style="flex: 1; justify-content: center;">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <!-- Admin Auth Modal -->
     <div id="admin-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -166,7 +235,7 @@
             <input type="password" id="admin-password" placeholder="Mật khẩu..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--bg-dark); color: white; margin-bottom: 15px; outline: none;">
             <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button id="btn-cancel-admin" class="secondary-btn" style="flex: 1;">Hủy</button>
-                <button id="btn-confirm-admin" class="primary-btn" style="flex: 1;">Xác nhận</button>
+                <button id="btn-confirm-admin" class="primary-btn" style="flex: 1; justify-content: center;">Xác nhận</button>
             </div>
             <p id="admin-error" class="error-msg" style="display: none; margin-top: 10px;">Mật khẩu không đúng!</p>
         </div>

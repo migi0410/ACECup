@@ -9,9 +9,61 @@ document.addEventListener('DOMContentLoaded', () => {
             tabContents.forEach(c => c.classList.remove('active'));
             
             btn.classList.add('active');
-            document.getElementById(btn.dataset.target).classList.add('active');
+            const targetEl = document.getElementById(btn.dataset.target);
+            if (targetEl) targetEl.classList.add('active');
         });
     });
+
+    // Toast Notification System
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        let icon = 'ph-info';
+        if (type === 'success') icon = 'ph-check-circle';
+        else if (type === 'error') icon = 'ph-warning-circle';
+        
+        toast.innerHTML = `<i class="ph-bold ${icon}"></i> <span>${message}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOutToast 0.3s forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3200);
+    }
+
+    // Custom Confirmation Dialog Modal
+    function showConfirm(title, message, onConfirm) {
+        const modal = document.getElementById('confirm-modal');
+        const titleEl = document.getElementById('confirm-title');
+        const msgEl = document.getElementById('confirm-msg');
+        const okBtn = document.getElementById('btn-ok-confirm');
+        const cancelBtn = document.getElementById('btn-cancel-confirm');
+        
+        if (!modal) {
+            if (window.confirm(message)) onConfirm();
+            return;
+        }
+        
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        modal.style.display = 'flex';
+        
+        const cleanup = () => {
+            modal.style.display = 'none';
+            okBtn.onclick = null;
+            cancelBtn.onclick = null;
+        };
+        
+        okBtn.onclick = () => {
+            cleanup();
+            onConfirm();
+        };
+        cancelBtn.onclick = cleanup;
+    }
 
     // Initialize Player Inputs
     const playersList = document.getElementById('players-list');
@@ -32,15 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let playerCount = 0;
     
-    function createPlayerRow(p) {
+    function createPlayerRow(p, isCustom = false) {
         playerCount++;
         const i = playerCount;
         const row = document.createElement('div');
         row.className = 'player-card';
         row.id = `player-row-${i}`;
-        
-        // Disable editing for Minh to always be proxy female? Or just let anyone change it.
-        // If we want anyone to change it, we shouldn't hardcode disabled.
         
         row.innerHTML = `
             <div class="player-avatar ${p.gender === 'M' ? 'm-avatar' : 'f-avatar'}">
@@ -55,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             <option value="F" ${p.gender === 'F' ? 'selected' : ''}>Nữ</option>
                         </select>
                     </div>
+                    ${isCustom ? `
+                        <button type="button" class="btn-remove-player" title="Xóa VĐV này" onclick="removePlayerRow(${i})">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    ` : ''}
                 </div>
             </div>
             <div class="player-active-toggle" title="Tham gia hôm nay">
@@ -68,32 +122,74 @@ document.addEventListener('DOMContentLoaded', () => {
         updateActiveCount();
     }
 
+    window.removePlayerRow = function(id) {
+        const row = document.getElementById(`player-row-${id}`);
+        if (row) {
+            row.remove();
+            updateActiveCount();
+            showToast('Đã xóa VĐV khỏi danh sách', 'info');
+        }
+    };
+
     window.updateActiveCount = function() {
         let activeCount = 0;
         let males = 0;
         let females = 0;
         for (let i = 1; i <= playerCount; i++) {
-            if (document.getElementById(`p-active-${i}`).checked) {
-                const name = document.getElementById(`p-name-${i}`).value.trim();
+            const activeEl = document.getElementById(`p-active-${i}`);
+            const nameEl = document.getElementById(`p-name-${i}`);
+            const genderEl = document.getElementById(`p-gender-${i}`);
+            
+            if (activeEl && activeEl.checked) {
+                const name = nameEl ? nameEl.value.trim() : '';
                 if (name) {
                     activeCount++;
-                    const isM = document.getElementById(`p-gender-${i}`).value === 'M';
+                    const isM = genderEl ? genderEl.value === 'M' : true;
                     const isProxy = (name.toLowerCase() === 'minh');
                     if (isM && !isProxy) males++;
                     else females++;
                 }
             }
         }
-        document.getElementById('player-count-badge').textContent = `${activeCount} Tham gia (Nam: ${males}, Nữ: ${females})`;
+        const badge = document.getElementById('player-count-badge');
+        if (badge) {
+            badge.textContent = `${activeCount} Tham gia (${males} Nam • ${females} Nữ)`;
+        }
     };
 
     predefinedPlayers.forEach(p => {
-        createPlayerRow(p);
+        createPlayerRow(p, false);
     });
 
     document.getElementById('btn-add-player').addEventListener('click', () => {
-        createPlayerRow({ name: "", gender: "M", proxy: false });
+        createPlayerRow({ name: "", gender: "M", proxy: false }, true);
+        showToast('Đã thêm 1 dòng VĐV mới. Nhập tên và chọn giới tính.', 'info');
     });
+
+    // Quick select all / deselect all
+    const btnSelectAll = document.getElementById('btn-select-all');
+    if (btnSelectAll) {
+        btnSelectAll.addEventListener('click', () => {
+            for (let i = 1; i <= playerCount; i++) {
+                const cb = document.getElementById(`p-active-${i}`);
+                if (cb) cb.checked = true;
+            }
+            updateActiveCount();
+            showToast('Đã chọn tất cả VĐV tham gia', 'info');
+        });
+    }
+
+    const btnDeselectAll = document.getElementById('btn-deselect-all');
+    if (btnDeselectAll) {
+        btnDeselectAll.addEventListener('click', () => {
+            for (let i = 1; i <= playerCount; i++) {
+                const cb = document.getElementById(`p-active-${i}`);
+                if (cb) cb.checked = false;
+            }
+            updateActiveCount();
+            showToast('Đã bỏ chọn tất cả VĐV', 'info');
+        });
+    }
 
     // Global state
     let state = {
@@ -136,6 +232,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Enter key submit in admin modal
+    const adminPassInput = document.getElementById('admin-password');
+    if (adminPassInput) {
+        adminPassInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('btn-confirm-admin').click();
+            }
+        });
+    }
+
     const dateInput = document.getElementById('tournament-date');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
@@ -155,65 +261,127 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => icon.style.animation = '', 500);
             }
             listenToFirebase();
+            showToast('Đang làm mới dữ liệu giải đấu...', 'info');
         });
+    }
+
+    // Connection Status Indicator
+    function updateConnectionStatus(isOnline, detail = '') {
+        const pill = document.getElementById('db-status-pill');
+        const text = document.getElementById('db-status-text');
+        if (!pill || !text) return;
+        
+        if (isOnline) {
+            pill.className = 'db-status-pill online';
+            text.textContent = 'Đồng bộ Cloud';
+            pill.title = 'Đang đồng bộ trực tuyến với Firebase Realtime Database';
+        } else {
+            pill.className = 'db-status-pill offline';
+            text.textContent = 'Lưu trữ máy (Offline)';
+            pill.title = 'Firebase tạm thời không kết nối được hoặc bị giới hạn quyền. Dữ liệu đang được lưu trữ an toàn ngay trên trình duyệt!';
+        }
     }
 
     function getDbPath() {
         return 'acecup_events/' + (dateInput ? dateInput.value : 'default');
     }
+    function getLocalStorageKey() {
+        return 'acecup_events_' + (dateInput ? dateInput.value : 'default');
+    }
 
     let currentDbRef = null;
     let lastStateString = '';
 
+    function loadStateData(data) {
+        if (data) {
+            state = data;
+            if (!state.players) state.players = [];
+            if (!state.rounds) state.rounds = [];
+            if (!state.matches) state.matches = [];
+            
+            window.isJustDrawn = false;
+            renderMatches();
+            updateLeaderboard();
+        } else {
+            state.players = [];
+            state.rounds = [];
+            state.matches = [];
+            const rContainer = document.getElementById('rounds-container');
+            if (rContainer) {
+                rContainer.innerHTML = '<div class="empty-state"><i class="ph-fill ph-calendar-blank"></i><p>Chưa có dữ liệu bốc thăm</p></div>';
+            }
+            const lTableM = document.querySelector('#leaderboard-table-male tbody');
+            if (lTableM) lTableM.innerHTML = '<tr><td colspan="8" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
+            const lTableF = document.querySelector('#leaderboard-table-female tbody');
+            if (lTableF) lTableF.innerHTML = '<tr><td colspan="8" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
+            updateOverviewStats(0, 0, 0, '-');
+        }
+    }
+
     function saveToFirebase() {
+        // Luôn luôn lưu vào LocalStorage tức thì để không bao giờ mất dữ liệu dù Firebase lỗi
+        try {
+            localStorage.setItem(getLocalStorageKey(), JSON.stringify(state));
+        } catch (e) {
+            console.error('LocalStorage write error:', e);
+        }
+
         if (currentDbRef && window.firebaseDB) {
             lastStateString = JSON.stringify(state);
-            currentDbRef.set(state);
+            currentDbRef.set(state).then(() => {
+                updateConnectionStatus(true);
+            }).catch(err => {
+                console.warn('Firebase set error:', err);
+                updateConnectionStatus(false, err.message);
+            });
         }
     }
 
     function listenToFirebase() {
-        if (!window.firebaseDB) return;
+        const localDataStr = localStorage.getItem(getLocalStorageKey());
+        if (localDataStr) {
+            try {
+                const localData = JSON.parse(localDataStr);
+                loadStateData(localData);
+            } catch(e) {}
+        }
+
+        if (!window.firebaseDB) {
+            updateConnectionStatus(false, 'Chế độ lưu trữ Offline');
+            return;
+        }
         
         if (currentDbRef) {
             currentDbRef.off();
         }
-        lastStateString = ''; // Chắc chắn load lại giao diện dù dữ liệu giống nhau
+        lastStateString = '';
         
         const path = getDbPath();
         currentDbRef = window.firebaseDB.ref(path);
         
         currentDbRef.on('value', (snapshot) => {
+            updateConnectionStatus(true);
             const data = snapshot.val();
             const dataString = JSON.stringify(data || {});
             
-            // Nếu dữ liệu giống y hệt state hiện tại (do chính client này vừa lưu), bỏ qua re-render
             if (dataString === lastStateString) {
                 return;
             }
             lastStateString = dataString;
 
             if (data) {
-                state = data;
-                if (!state.players) state.players = [];
-                if (!state.rounds) state.rounds = [];
-                if (!state.matches) state.matches = [];
-                
-                window.isJustDrawn = false;
-                renderMatches();
-                updateLeaderboard();
-            } else {
-                state.players = [];
-                state.rounds = [];
-                state.matches = [];
-                const rContainer = document.getElementById('rounds-container');
-                if (rContainer) {
-                    rContainer.innerHTML = '<div class="empty-state"><i class="ph-fill ph-calendar-blank"></i><p>Chưa có dữ liệu bốc thăm</p></div>';
-                }
-                const lTableM = document.querySelector('#leaderboard-table-male tbody');
-                if (lTableM) lTableM.innerHTML = '<tr><td colspan="7" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
-                const lTableF = document.querySelector('#leaderboard-table-female tbody');
-                if (lTableF) lTableF.innerHTML = '<tr><td colspan="7" class="text-center">Chưa có dữ liệu bốc thăm</td></tr>';
+                try {
+                    localStorage.setItem(getLocalStorageKey(), JSON.stringify(data));
+                } catch(e) {}
+                loadStateData(data);
+            } else if (!localDataStr) {
+                loadStateData(null);
+            }
+        }, (error) => {
+            console.warn('Firebase read error (sẽ dùng LocalStorage):', error);
+            updateConnectionStatus(false, error.message);
+            if (localDataStr) {
+                try { loadStateData(JSON.parse(localDataStr)); } catch(e) {}
             }
         });
     }
@@ -246,10 +414,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let logicalFemales = 0;
             
             for (let i = 1; i <= playerCount; i++) {
-                const isActive = document.getElementById(`p-active-${i}`).checked;
-                if (!isActive) continue;
+                const activeEl = document.getElementById(`p-active-${i}`);
+                if (!activeEl || !activeEl.checked) continue;
                 
-                const name = document.getElementById(`p-name-${i}`).value.trim();
+                const nameEl = document.getElementById(`p-name-${i}`);
+                const name = nameEl ? nameEl.value.trim() : '';
                 if (!name) {
                     errorMsg.textContent = "Vui lòng nhập đầy đủ tên cho các VĐV tham gia.";
                     errorMsg.style.display = 'block';
@@ -282,23 +451,30 @@ document.addEventListener('DOMContentLoaded', () => {
             window.isJustDrawn = true;
             generateDraw();
             
+            showToast(`Bốc thăm thành công! Tổng cộng ${state.matches.length} trận đấu.`, 'success');
             document.querySelector('[data-target="matches-tab"]').click();
         });
     });
 
     document.getElementById('btn-reset-draw').addEventListener('click', () => {
         requireAdmin(() => {
-            if (confirm('Bạn có chắc chắn muốn hủy kết quả bốc thăm và xóa điểm?')) {
-                state.rounds = [];
-                state.matches = [];
-                renderMatches();
-                updateLeaderboard();
-                saveToFirebase();
-                document.querySelector('[data-target="players-tab"]').click();
-            }
+            showConfirm(
+                'Hủy Bốc Thăm & Xóa Điểm',
+                'Bạn có chắc chắn muốn hủy toàn bộ kết quả bốc thăm và xóa hết điểm số của ngày này? Thao tác này không thể hoàn tác.',
+                () => {
+                    state.rounds = [];
+                    state.matches = [];
+                    renderMatches();
+                    updateLeaderboard();
+                    saveToFirebase();
+                    showToast('Đã hủy lịch thi đấu thành công.', 'info');
+                    document.querySelector('[data-target="players-tab"]').click();
+                }
+            );
         });
     });
 
+    // Thuật toán Tối ưu Toàn cục (Multi-restart Global Tournament Optimizer)
     function generateDraw() {
         state.rounds = [];
         state.matches = [];
@@ -315,16 +491,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetMatches = 12;
         const totalRounds = Math.ceil(targetMatches / numMatches);
 
-        // Thuật toán Tối ưu Toàn cục (Multi-restart Global Optimizer) - Đạt chuẩn công bằng 100%
         let bestSchedule = null;
         let minPenalty = Infinity;
 
-        // Chạy tối ưu lặp 400 lần (< 20ms) để tìm lịch thi đấu có độ phạt thấp nhất (0 trùng đồng đội, 0 trùng đối thủ)
-        for (let trial = 0; trial < 400; trial++) {
+        // Chạy lặp tối ưu hóa 500 lần (< 25ms) tìm lịch thi đấu có 0 trùng đồng đội và 0 trùng đối thủ
+        for (let trial = 0; trial < 500; trial++) {
             let trialRounds = [];
-            let partnerCounts = {}; // "mId-fId" -> count
-            let oppCountsM = {}; // "m1-m2" -> count
-            let oppCountsF = {}; // "f1-f2" -> count
+            let partnerCounts = {};
+            let oppCountsM = {};
+            let oppCountsF = {};
             let playerMatches = {};
             state.players.forEach(p => playerMatches[p.id] = 0);
 
@@ -358,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let bestRoundMatches = null;
                 let minRoundOppCost = Infinity;
 
-                for (let attempt = 0; attempt < 40; attempt++) {
+                for (let attempt = 0; attempt < 50; attempt++) {
                     let shuffledPairs = [...roundPairs].sort(() => Math.random() - 0.5);
                     let currentOppCost = 0;
                     let currentMatches = [];
@@ -375,7 +550,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         currentOppCost += (mOpp * mOpp * 10) + (fOpp * fOpp * 10);
                         currentMatches.push({
-                            id: (r - 1) * 10 + i + 1,
+                            id: (r - 1) * numMatches + i + 1,
+                            court: i + 1,
                             round: r,
                             team1: t1,
                             team2: t2,
@@ -436,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (penalty < minPenalty) {
                 minPenalty = penalty;
                 bestSchedule = trialRounds;
-                if (penalty === 0) break; // Tìm thấy lịch đấu hoàn hảo tuyệt đối!
+                if (penalty === 0) break; // Lịch đấu hoàn hảo 100%
             }
         }
 
@@ -453,50 +629,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function getGenderIcon(p) {
         if (p.gender === 'M' && !p.isProxy) return '<i class="ph-fill ph-gender-male gender-icon m"></i>';
         if (p.gender === 'F') return '<i class="ph-fill ph-gender-female gender-icon f"></i>';
-        // Male acting as female
-        return '<i class="ph-fill ph-gender-neuter gender-icon f" title="Nam đánh như Nữ"></i>';
+        return '<i class="ph-fill ph-gender-neuter gender-icon f" title="Nam đánh suất Nữ"></i>';
     }
 
     function renderMatches() {
         const container = document.getElementById('rounds-container');
-        if (state.rounds.length === 0) {
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!state.rounds || state.rounds.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <i class="ph ph-calendar-x"></i>
+                    <i class="ph-fill ph-calendar-blank"></i>
                     <p>Chưa có lịch thi đấu. Hãy sang mục "Người chơi" để bốc thăm.</p>
-                </div>`;
+                </div>
+            `;
             return;
         }
 
         const isAnimating = window.isJustDrawn;
         window.isJustDrawn = false;
+
         const allNames = state.players.map(p => p.name);
 
-        container.innerHTML = '';
-        state.rounds.forEach((roundObj, rIndex) => {
+        state.rounds.forEach(roundObj => {
             const rBlock = document.createElement('div');
             rBlock.className = 'round-block';
-            
-            let restingHTML = '';
-            const resting = roundObj.resting || [];
-            if (resting.length > 0) {
-                const tags = resting.map(p => `<div class="resting-tag">${getGenderIcon(p)} ${p.name}</div>`).join('');
-                restingHTML = `
+
+            let restingHtml = '';
+            if (roundObj.resting && roundObj.resting.length > 0) {
+                const restTags = roundObj.resting.map(p => 
+                    `<div class="resting-tag">${getGenderIcon(p)} ${p.name}</div>`
+                ).join('');
+                restingHtml = `
                     <div class="resting-block">
-                        <span><i class="ph ph-coffee"></i> Nghỉ vòng này:</span>
-                        ${tags}
+                        <span><i class="ph-fill ph-coffee"></i> Nghỉ vòng này:</span>
+                        ${restTags}
                     </div>
                 `;
             }
 
             rBlock.innerHTML = `
                 <div class="round-header">
-                    <h3>Vòng ${rIndex + 1}</h3>
+                    <h3>Vòng ${roundObj.round}</h3>
                     <div class="line"></div>
                 </div>
-                ${restingHTML}
+                ${restingHtml}
             `;
-            
+
             const matches = roundObj.matches || [];
             matches.forEach(match => {
                 const card = document.createElement('div');
@@ -513,10 +693,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const t2f = isAnimating ? `<span class="shuffle-text" data-real="${match.team2.f.name}">???</span>` : `<span>${match.team2.f.name}</span>`;
                 
                 const controlClass = isAnimating ? 'draw-hidden' : '';
+                const courtNum = match.court || (((match.id - 1) % 3) + 1);
 
                 card.innerHTML = `
+                    <div class="match-meta-bar ${controlClass}">
+                        <span class="court-badge"><i class="ph-bold ph-tennis-ball"></i> Trận ${match.id} • Sân ${courtNum}</span>
+                        <span class="match-status-pill ${match.isFinished ? 'done' : ''}">
+                            ${match.isFinished ? '<i class="ph-bold ph-check"></i> Đã có điểm' : 'Chưa thi đấu'}
+                        </span>
+                    </div>
                     <div class="match-layout">
                         <div class="team-box team-left ${isT1Win ? 'winner' : ''}" id="team1-${match.id}">
+                            ${isT1Win ? '<span class="winner-chip"><i class="ph-bold ph-trophy"></i> THẮNG</span>' : ''}
                             <div class="player-tag">${getGenderIcon(match.team1.m)} ${t1m}</div>
                             <div class="player-tag">${getGenderIcon(match.team1.f)} ${t1f}</div>
                         </div>
@@ -524,16 +712,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="match-center">
                             <div class="vs-badge">VS</div>
                             <div class="score-control ${controlClass}">
-                                <input type="number" class="score-input" id="s1-${match.id}" value="${match.score1}" min="0">
+                                <input type="number" class="score-input" id="s1-${match.id}" value="${match.score1}" min="0" placeholder="0">
                                 <span class="score-dash">-</span>
-                                <input type="number" class="score-input" id="s2-${match.id}" value="${match.score2}" min="0">
+                                <input type="number" class="score-input" id="s2-${match.id}" value="${match.score2}" min="0" placeholder="0">
                             </div>
-                            <div style="display: flex; gap: 5px; width: 100%;">
-                                <button class="btn-save-score ${controlClass}" onclick="saveMatch(${match.id})" style="flex: 1; justify-content: center; ${match.isFinished ? 'background: #4ade80; color: #000;' : ''}">
+                            <div style="display: flex; gap: 6px; width: 100%;">
+                                <button class="btn-save-score ${controlClass}" onclick="saveMatch(${match.id})" style="flex: 1; justify-content: center; ${match.isFinished ? 'background: #10b981; color: #0b0f19;' : ''}">
                                     <i class="ph-bold ${match.isFinished ? 'ph-pencil' : 'ph-check'}"></i> ${match.isFinished ? 'Sửa' : 'Lưu'}
                                 </button>
                                 ${match.isFinished ? `
-                                <button class="btn-save-score ${controlClass}" onclick="clearMatchScore(${match.id})" style="flex: 0 0 auto; justify-content: center; padding: 6px 10px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Xóa điểm">
+                                <button class="btn-save-score ${controlClass}" onclick="clearMatchScore(${match.id})" style="flex: 0 0 auto; justify-content: center; padding: 7px 10px; background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3);" title="Xóa điểm trận này">
                                     <i class="ph-bold ph-trash"></i>
                                 </button>
                                 ` : ''}
@@ -541,6 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         
                         <div class="team-box team-right ${isT2Win ? 'winner' : ''}" id="team2-${match.id}">
+                            ${isT2Win ? '<span class="winner-chip"><i class="ph-bold ph-trophy"></i> THẮNG</span>' : ''}
                             <div class="player-tag">${getGenderIcon(match.team2.m)} ${t2m}</div>
                             <div class="player-tag">${getGenderIcon(match.team2.f)} ${t2f}</div>
                         </div>
@@ -576,9 +765,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         if (index === pendingCards.length - 1) {
                             clearInterval(shuffleInterval);
-                            saveToFirebase(); // Save right after animation finishes
+                            saveToFirebase();
                         }
-                    }, 600 + (index * 400));
+                    }, 500 + (index * 300));
                 });
             }
         } else {
@@ -587,42 +776,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.clearMatchScore = function(matchId) {
-        if (!confirm('Bạn có chắc chắn muốn xóa điểm trận này?')) return;
-        
-        const match = state.matches.find(m => m.id === matchId);
-        if (!match) return;
-        
-        match.score1 = '';
-        match.score2 = '';
-        match.isFinished = false;
+        showConfirm(
+            'Xóa Điểm Trận Đấu',
+            'Bạn có chắc chắn muốn xóa điểm của trận đấu này?',
+            () => {
+                const match = state.matches.find(m => m.id === matchId);
+                if (!match) return;
+                
+                match.score1 = '';
+                match.score2 = '';
+                match.isFinished = false;
 
-        if (state.rounds) {
-            state.rounds.forEach(r => {
-                if (r.matches) {
-                    const rMatch = r.matches.find(m => m.id === matchId);
-                    if (rMatch) {
-                        rMatch.score1 = '';
-                        rMatch.score2 = '';
-                        rMatch.isFinished = false;
-                    }
+                if (state.rounds) {
+                    state.rounds.forEach(r => {
+                        if (r.matches) {
+                            const rMatch = r.matches.find(m => m.id === matchId);
+                            if (rMatch) {
+                                rMatch.score1 = '';
+                                rMatch.score2 = '';
+                                rMatch.isFinished = false;
+                            }
+                        }
+                    });
                 }
-            });
-        }
-        
-        updateLeaderboard();
-        renderMatches();
-        saveToFirebase();
+                
+                updateLeaderboard();
+                renderMatches();
+                saveToFirebase();
+                showToast(`Đã xóa điểm trận ${matchId}.`, 'info');
+            }
+        );
     };
 
     window.saveMatch = function(matchId) {
         const match = state.matches.find(m => m.id === matchId);
         if (!match) return;
         
-        const s1 = parseInt(document.getElementById(`s1-${matchId}`).value);
-        const s2 = parseInt(document.getElementById(`s2-${matchId}`).value);
+        const s1El = document.getElementById(`s1-${matchId}`);
+        const s2El = document.getElementById(`s2-${matchId}`);
+        if (!s1El || !s2El) return;
+
+        const s1 = parseInt(s1El.value);
+        const s2 = parseInt(s2El.value);
         
-        if (isNaN(s1) || isNaN(s2)) {
-            alert('Vui lòng nhập điểm hợp lệ!');
+        if (isNaN(s1) || isNaN(s2) || s1 < 0 || s2 < 0) {
+            showToast('Vui lòng nhập điểm số hợp lệ cho cả 2 đội!', 'error');
             return;
         }
         
@@ -630,7 +828,6 @@ document.addEventListener('DOMContentLoaded', () => {
         match.score2 = s2;
         match.isFinished = true;
 
-        // Cập nhật đồng bộ vào state.rounds vì Firebase tách object reference khi load lại
         if (state.rounds) {
             state.rounds.forEach(r => {
                 if (r.matches) {
@@ -644,24 +841,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        const card = document.getElementById(`match-card-${matchId}`);
-        if(card) card.classList.add('finished');
-        
-        const t1 = document.getElementById(`team1-${matchId}`);
-        const t2 = document.getElementById(`team2-${matchId}`);
-        if(t1) t1.classList.remove('winner');
-        if(t2) t2.classList.remove('winner');
-        
-        if (s1 > s2) {
-            if(t1) t1.classList.add('winner');
-        } else if (s2 > s1) {
-            if(t2) t2.classList.add('winner');
-        }
-        
         updateLeaderboard();
         renderMatches();
         saveToFirebase();
+        showToast(`Đã lưu điểm trận ${matchId} (${s1} - ${s2}) thành công!`, 'success');
     };
+
+    function updateOverviewStats(total, finished, pending, topPlayers) {
+        const totalEl = document.getElementById('stat-total-matches');
+        const finEl = document.getElementById('stat-finished-matches');
+        const penEl = document.getElementById('stat-pending-matches');
+        const topEl = document.getElementById('stat-top-players');
+
+        if (totalEl) totalEl.textContent = total;
+        if (finEl) finEl.textContent = finished;
+        if (penEl) penEl.textContent = pending;
+        if (topEl) topEl.textContent = topPlayers;
+    }
 
     function updateLeaderboard() {
         const stats = {};
@@ -686,8 +882,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        let finishedMatchesCount = 0;
+
         state.matches.forEach(m => {
             if (m.isFinished) {
+                finishedMatchesCount++;
                 const s1 = parseInt(m.score1) || 0;
                 const s2 = parseInt(m.score2) || 0;
 
@@ -736,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (aWins !== bWins) {
                     if (aWins > bWins) a.h2hWonTiebreak = true;
                     else b.h2hWonTiebreak = true;
-                    return bWins - aWins; // Người thắng đối đầu nhiều hơn xếp trên
+                    return bWins - aWins;
                 }
 
                 const aDiff = h2h[a.p.id][b.p.id].diff;
@@ -744,7 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (aDiff !== bDiff) {
                     if (aDiff > bDiff) a.h2hWonTiebreak = true;
                     else b.h2hWonTiebreak = true;
-                    return bDiff - aDiff; // Hiệu số đối đầu cao hơn xếp trên
+                    return bDiff - aDiff;
                 }
             }
 
@@ -760,6 +959,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const males = Object.values(stats).filter(s => s.p.logicalGender === 'M').sort(sortFn);
         const females = Object.values(stats).filter(s => s.p.logicalGender === 'F').sort(sortFn);
+
+        // Update Overview Stats
+        const totalMatches = state.matches.length;
+        const pendingMatches = totalMatches - finishedMatchesCount;
+        let topSummary = '-';
+        if (males.length > 0 && females.length > 0) {
+            topSummary = `${males[0].p.name} (${males[0].wins}W) • ${females[0].p.name} (${females[0].wins}W)`;
+        }
+        updateOverviewStats(totalMatches, finishedMatchesCount, pendingMatches, topSummary);
 
         const tbodyM = document.querySelector('#leaderboard-table-male tbody');
         const tbodyF = document.querySelector('#leaderboard-table-female tbody');
@@ -793,7 +1001,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let noteHTML = '';
                 if (row.h2hWonTiebreak) {
-                    noteHTML = '<span class="h2h-badge" title="Ưu tiên hơn nhờ thắng đối đầu trực tiếp"><i class="ph-bold ph-sword"></i> H2H</span>';
+                    noteHTML = '<span class="h2h-badge" title="Ưu tiên hơn nhờ thắng trận đối đầu trực tiếp"><i class="ph-bold ph-sword"></i> H2H</span>';
                 }
 
                 tr.className = rankBadgeClass;
@@ -821,4 +1029,28 @@ document.addEventListener('DOMContentLoaded', () => {
         renderRows(males, tbodyM);
         renderRows(females, tbodyF);
     }
+
+    // Filter sub-tabs (All / Male / Female)
+    const filterBtns = document.querySelectorAll('.filter-tab-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.dataset.filter;
+            const secM = document.getElementById('section-table-male');
+            const secF = document.getElementById('section-table-female');
+
+            if (filter === 'all') {
+                if (secM) secM.style.display = 'block';
+                if (secF) secF.style.display = 'block';
+            } else if (filter === 'male') {
+                if (secM) secM.style.display = 'block';
+                if (secF) secF.style.display = 'none';
+            } else if (filter === 'female') {
+                if (secM) secM.style.display = 'none';
+                if (secF) secF.style.display = 'block';
+            }
+        });
+    });
 });
