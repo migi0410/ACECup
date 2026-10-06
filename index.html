@@ -37,10 +37,67 @@
             </div>
         </header>
 
+        <!-- TOURNAMENT HERO SHOWCASE BANNER -->
+        <section class="tournament-hero">
+            <div class="hero-glow-orb orb-1"></div>
+            <div class="hero-glow-orb orb-2"></div>
+            <div class="hero-card">
+                <div class="hero-content">
+                    <div class="hero-badge-wrap">
+                        <span class="hero-live-pill"><span class="pulsing-dot"></span> SỰ KIỆN SÂN ĐẤU</span>
+                        <span class="hero-tag"><i class="ph-fill ph-trophy"></i> DE BADMINTON 2026</span>
+                    </div>
+                    <h2 class="hero-title">Giải Cầu Lông Giao Lưu <span class="text-gradient">ACE CUP</span></h2>
+                    <p class="hero-subtitle">12 tay vợt xuất sắc • Bốc thăm công bằng tuyệt đối • Pha cầu kịch tính nghẹt thở</p>
+                    
+                    <div class="hero-chips">
+                        <div class="hero-chip">
+                            <i class="ph-fill ph-users"></i>
+                            <div><strong>12</strong> VĐV</div>
+                        </div>
+                        <div class="hero-chip">
+                            <i class="ph-fill ph-fire"></i>
+                            <div><strong>12</strong> Trận Đấu</div>
+                        </div>
+                        <div class="hero-chip">
+                            <i class="ph-fill ph-medal"></i>
+                            <div><strong>3</strong> Cặp Huy Chương</div>
+                        </div>
+                        <div class="hero-chip">
+                            <i class="ph-fill ph-scales"></i>
+                            <div><strong>H2H</strong> Chuẩn Quốc Tế</div>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <button class="hero-btn-primary" onclick="document.querySelector('[data-target=\'gallery-tab\']').click()">
+                            <i class="ph-bold ph-camera"></i> Xem Album Kỷ Niệm (12 Ảnh)
+                        </button>
+                        <button class="hero-btn-secondary" onclick="document.querySelector('[data-target=\'matches-tab\']').click()">
+                            <i class="ph-bold ph-sword"></i> Xem Lịch Thi Đấu
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="hero-img-container" id="hero-img-card" title="Bấm để phóng to ảnh toàn đội">
+                        <img src="assets/photo_2.jpg" alt="DE Badminton Champion Celebration" class="hero-photo" id="hero-banner-img">
+                        <div class="hero-img-badge">
+                            <i class="ph-fill ph-crown"></i> Vinh danh tập thể ACE CUP
+                        </div>
+                        <div class="hero-zoom-hint">
+                            <i class="ph-bold ph-arrows-out"></i> Bấm xem ảnh lớn
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <nav class="tabs">
             <button class="tab-btn active" data-target="players-tab"><i class="ph-bold ph-users-three"></i> <span>Người chơi</span></button>
             <button class="tab-btn" data-target="matches-tab"><i class="ph-bold ph-calendar-check"></i> <span>Lịch đấu</span></button>
             <button class="tab-btn" data-target="leaderboard-tab"><i class="ph-bold ph-ranking"></i> <span>Bảng xếp hạng</span></button>
+            <button class="tab-btn" data-target="gallery-tab"><i class="ph-bold ph-images"></i> <span>Khoảnh khắc (12)</span></button>
         </nav>
 
         <main class="tab-content-container">
@@ -146,6 +203,25 @@
                         </div>
                     </div>
 
+                    <!-- PODIUM SPOTLIGHT BANNER -->
+                    <div class="podium-spotlight-card">
+                        <div class="podium-banner-media">
+                            <img src="assets/photo_9.jpg" alt="Vinh danh Top Vận Động Viên ACE Cup" id="podium-img-preview">
+                            <div class="podium-banner-overlay"></div>
+                        </div>
+                        <div class="podium-banner-info">
+                            <div class="podium-badge">
+                                <i class="ph-fill ph-crown"></i>
+                                <span>VINH DANH NHÀ VÔ ĐỊCH &amp; TỔNG KẾT GIẢI</span>
+                            </div>
+                            <h3>Khoảnh Khắc Nhận Huy Chương DE Badminton</h3>
+                            <p>Tôn vinh tinh thần thể thao rực cháy, những cú smash uy lực và nụ cười rạng rỡ của tất cả tay vợt ACE Cup!</p>
+                            <button type="button" class="btn-view-gallery-link" onclick="document.querySelector('[data-target=\'gallery-tab\']').click()">
+                                <i class="ph-bold ph-images"></i> Xem toàn bộ 12 khoảnh khắc trao giải &amp; sân đấu
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Sub-tabs for filtering Male / Female on mobile -->
                     <div class="leaderboard-filter-tabs">
                         <button class="filter-tab-btn active" data-filter="all"><i class="ph-bold ph-rows"></i> Xem tất cả</button>
@@ -206,6 +282,40 @@
                     </div>
                 </div>
             </section>
+
+            <!-- GALLERY TAB -->
+            <section id="gallery-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>Khoảnh Khắc &amp; Kỷ Niệm Sân Đấu</h2>
+                            <p class="subtitle">12 hình ảnh ghi lại trọn vẹn cảm xúc, nụ cười và tinh thần thi đấu giao lưu</p>
+                        </div>
+                        <span class="badge" id="gallery-count-badge">12 khoảnh khắc</span>
+                    </div>
+
+                    <!-- Category Filter Chips -->
+                    <div class="gallery-filter-bar">
+                        <button class="gallery-filter-btn active" data-filter="all">
+                            <i class="ph-bold ph-squares-four"></i> Tất cả (12)
+                        </button>
+                        <button class="gallery-filter-btn" data-filter="awards">
+                            <i class="ph-fill ph-trophy"></i> Trao giải &amp; Huy chương (7)
+                        </button>
+                        <button class="gallery-filter-btn" data-filter="court">
+                            <i class="ph-fill ph-tennis-ball"></i> Sân đấu rực lửa (3)
+                        </button>
+                        <button class="gallery-filter-btn" data-filter="fun">
+                            <i class="ph-fill ph-sparkle"></i> Hậu trường &amp; Kỷ niệm (2)
+                        </button>
+                    </div>
+
+                    <!-- Responsive Photo Grid -->
+                    <div class="gallery-grid" id="gallery-grid">
+                        <!-- Populated dynamically via JS with fallback cards -->
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -239,6 +349,32 @@
             </div>
             <p id="admin-error" class="error-msg" style="display: none; margin-top: 10px;">Mật khẩu không đúng!</p>
         </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox-overlay" style="display: none;">
+        <button class="lightbox-close-btn" id="lightbox-close" title="Đóng (ESC)">
+            <i class="ph-bold ph-x"></i>
+        </button>
+        <button class="lightbox-nav-btn prev" id="lightbox-prev" title="Ảnh trước (←)">
+            <i class="ph-bold ph-caret-left"></i>
+        </button>
+        <div class="lightbox-content-wrap">
+            <div class="lightbox-img-frame">
+                <img id="lightbox-img" src="" alt="Khoảnh khắc giải đấu">
+            </div>
+            <div class="lightbox-info-bar">
+                <div class="lightbox-meta">
+                    <span class="lightbox-category" id="lightbox-category">Trao giải</span>
+                    <span class="lightbox-counter" id="lightbox-counter">1 / 12</span>
+                </div>
+                <h4 class="lightbox-title" id="lightbox-title">DE Badminton</h4>
+                <p class="lightbox-caption" id="lightbox-caption">Khoảnh khắc ấn tượng giải đấu</p>
+            </div>
+        </div>
+        <button class="lightbox-nav-btn next" id="lightbox-next" title="Ảnh tiếp theo (→)">
+            <i class="ph-bold ph-caret-right"></i>
+        </button>
     </div>
 
     <!-- Firebase SDK (Compat) -->

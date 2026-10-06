@@ -1053,4 +1053,260 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // ==========================================================================
+    // TOURNAMENT PHOTO GALLERY & LIGHTBOX SYSTEM
+    // ==========================================================================
+    const tournamentPhotos = [
+        {
+            id: 1,
+            src: 'assets/photo_1.jpg',
+            title: 'Tập Thể ACE Cup Rạng Rỡ Nhận Thưởng & Huy Chương',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Toàn thể 12 VĐV cùng khoe huy chương và phần thưởng tại sân DE Badminton',
+            aspect: 'portrait'
+        },
+        {
+            id: 2,
+            src: 'assets/photo_2.jpg',
+            title: 'Đại Gia Đình DE Badminton Toả Sáng Trên Sân Đấu',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Khoảnh khắc rực rỡ và nụ cười chiến thắng của tất cả tay vợt ACE Cup',
+            aspect: 'landscape'
+        },
+        {
+            id: 3,
+            src: 'assets/photo_3.jpg',
+            title: 'Bộ Ba Cặp Đôi Đoạt Huy Chương ACE Cup',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Các cặp đôi xuất sắc nhất giải đấu cùng khoe huy chương Vàng - Bạc - Đồng',
+            aspect: 'portrait'
+        },
+        {
+            id: 4,
+            src: 'assets/photo_4.jpg',
+            title: 'Pha Đỡ Cầu Huyền Thoại "Full Giáp Nón Bảo Hiểm"',
+            category: 'court',
+            categoryName: 'Sân đấu',
+            desc: 'Chiến thuật phòng thủ đỉnh cao có 1-0-2 khiến cả sân cười ngả nghiêng',
+            aspect: 'portrait'
+        },
+        {
+            id: 5,
+            src: 'assets/photo_5.jpg',
+            title: 'Năng Lượng Tràn Đầy Sau Loạt Trận Căng Thẳng',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Các tay vợt tạo dáng nhí nhảnh ăn mừng một ngày thi đấu bùng nổ',
+            aspect: 'portrait'
+        },
+        {
+            id: 6,
+            src: 'assets/photo_6.jpg',
+            title: 'Top 6 Tay Vợt Đoạt Huy Chương Danh Giá',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Nụ cười rạng rỡ của 6 VĐV xuất sắc nhất tại bục vinh danh DE Badminton',
+            aspect: 'portrait'
+        },
+        {
+            id: 7,
+            src: 'assets/photo_7.jpg',
+            title: 'Khoảnh Khắc Check-in Nhí Nhảnh Của Hội Anh Chị Em',
+            category: 'court',
+            categoryName: 'Sân đấu',
+            desc: 'Không khí giao lưu ngập tràn tiếng cười và tinh thần thể thao đẹp mắt',
+            aspect: 'landscape'
+        },
+        {
+            id: 8,
+            src: 'assets/photo_8.jpg',
+            title: 'Sẵn Sàng Cho Trận Đấu Rực Lửa Tại Thảm Xanh',
+            category: 'court',
+            categoryName: 'Sân đấu',
+            desc: 'Các VĐV hào hứng trước khi bước vào những ván đấu quyết định',
+            aspect: 'landscape'
+        },
+        {
+            id: 9,
+            src: 'assets/photo_9.jpg',
+            title: 'Huy Chương Vàng, Bạc, Đồng Hội Tụ Cùng Tỏa Sáng',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Những nỗ lực thi đấu hết mình đã được đền đáp xứng đáng',
+            aspect: 'landscape'
+        },
+        {
+            id: 10,
+            src: 'assets/photo_10.jpg',
+            title: 'Niềm Vui Nhân Đôi Cùng Phong Bì & Huy Chương',
+            category: 'awards',
+            categoryName: 'Trao giải',
+            desc: 'Phần thưởng xứng đáng cho những nỗ lực bứt phá từng set cầu',
+            aspect: 'portrait'
+        },
+        {
+            id: 11,
+            src: 'assets/photo_11.jpg',
+            title: 'Hậu Trường Chilling Sau Khi Cháy Hết Mình',
+            category: 'fun',
+            categoryName: 'Hậu trường',
+            desc: 'Khoảnh khắc quây quần tâm sự, nghỉ ngơi sau chuỗi trận nảy lửa',
+            aspect: 'landscape'
+        },
+        {
+            id: 12,
+            src: 'assets/photo_12.jpg',
+            title: 'Selfie Toàn Đội - Tình Bạn Bền Chặt Qua Từng Đường Cầu',
+            category: 'fun',
+            categoryName: 'Hậu trường',
+            desc: 'Kỷ niệm khó phai của giải đấu giao lưu kết nối đam mê cầu lông',
+            aspect: 'landscape'
+        }
+    ];
+
+    let currentPhotoIndex = 0;
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxTitle = document.getElementById('lightbox-title');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxCategory = document.getElementById('lightbox-category');
+    const lightboxCounter = document.getElementById('lightbox-counter');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+
+    function openLightbox(index) {
+        if (index < 0 || index >= tournamentPhotos.length) return;
+        currentPhotoIndex = index;
+        const photo = tournamentPhotos[currentPhotoIndex];
+        
+        if (lightboxImg) lightboxImg.src = photo.src;
+        if (lightboxTitle) lightboxTitle.textContent = photo.title;
+        if (lightboxCaption) lightboxCaption.textContent = photo.desc;
+        if (lightboxCategory) {
+            lightboxCategory.textContent = photo.categoryName;
+            lightboxCategory.className = `lightbox-category ${photo.category}`;
+        }
+        if (lightboxCounter) lightboxCounter.textContent = `${currentPhotoIndex + 1} / ${tournamentPhotos.length}`;
+        
+        if (lightboxModal) {
+            lightboxModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeLightbox() {
+        if (lightboxModal) {
+            lightboxModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    function nextLightboxPhoto() {
+        openLightbox((currentPhotoIndex + 1) % tournamentPhotos.length);
+    }
+
+    function prevLightboxPhoto() {
+        openLightbox((currentPhotoIndex - 1 + tournamentPhotos.length) % tournamentPhotos.length);
+    }
+
+    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+    if (lightboxNext) lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); nextLightboxPhoto(); });
+    if (lightboxPrev) lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); prevLightboxPhoto(); });
+    
+    if (lightboxModal) {
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal) closeLightbox();
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (!lightboxModal || lightboxModal.style.display !== 'flex') return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowRight') nextLightboxPhoto();
+        else if (e.key === 'ArrowLeft') prevLightboxPhoto();
+    });
+
+    // Hero Image Card Click
+    const heroImgCard = document.getElementById('hero-img-card');
+    if (heroImgCard) {
+        heroImgCard.addEventListener('click', () => {
+            openLightbox(1); // photo_2.jpg
+        });
+    }
+
+    // Podium Preview Image Click
+    const podiumImgPreview = document.getElementById('podium-img-preview');
+    if (podiumImgPreview) {
+        podiumImgPreview.addEventListener('click', () => {
+            openLightbox(8); // photo_9.jpg
+        });
+    }
+
+    // Render Gallery
+    const galleryGrid = document.getElementById('gallery-grid');
+    const galleryFilterBtns = document.querySelectorAll('.gallery-filter-btn');
+
+    function renderGallery(filter = 'all') {
+        if (!galleryGrid) return;
+        galleryGrid.innerHTML = '';
+
+        const filtered = filter === 'all' 
+            ? tournamentPhotos 
+            : tournamentPhotos.filter(p => p.category === filter);
+
+        filtered.forEach((photo) => {
+            const originalIndex = tournamentPhotos.findIndex(p => p.id === photo.id);
+            const card = document.createElement('div');
+            card.className = 'gallery-card';
+            card.setAttribute('data-category', photo.category);
+            
+            card.innerHTML = `
+                <div class="gallery-card-thumb-wrap">
+                    <span class="gallery-category-pill ${photo.category}">
+                        <i class="ph-fill ${photo.category === 'awards' ? 'ph-trophy' : (photo.category === 'court' ? 'ph-tennis-ball' : 'ph-sparkle')}"></i>
+                        ${photo.categoryName}
+                    </span>
+                    <img src="${photo.src}" alt="${photo.title}" class="gallery-card-thumb" loading="lazy">
+                    <div class="gallery-card-overlay">
+                        <div class="gallery-expand-icon">
+                            <i class="ph-bold ph-arrows-out-simple"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-card-body">
+                    <h4 class="gallery-card-title">${photo.title}</h4>
+                    <p class="gallery-card-desc">${photo.desc}</p>
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                openLightbox(originalIndex);
+            });
+
+            galleryGrid.appendChild(card);
+        });
+
+        // Update badge count
+        const countBadge = document.getElementById('gallery-count-badge');
+        if (countBadge) {
+            countBadge.textContent = `${filtered.length} khoảnh khắc`;
+        }
+    }
+
+    galleryFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            galleryFilterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGallery(btn.dataset.filter);
+        });
+    });
+
+    // Initial render of gallery
+    renderGallery('all');
 });
+
