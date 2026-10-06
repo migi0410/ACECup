@@ -2,477 +2,333 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bốc Thăm Cầu Lông</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ACE Cup 2026 • Giải Cầu Lông Đôi Nam Nữ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
-        <header>
-            <div class="header-top">
-                <div class="brand">
-                    <div class="brand-logo">
-                        <i class="ph-fill ph-trophy"></i>
-                    </div>
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <h1>ACE Cup</h1>
-                            <div id="db-status-pill" class="db-status-pill online" title="Kiểm tra trạng thái kết nối Cloud Database">
-                                <span class="status-dot"></span>
-                                <span id="db-status-text">Đang kết nối</span>
-                            </div>
-                        </div>
-                        <p class="brand-tagline">Giải Cầu Lông Đôi Nam Nữ Giao Lưu</p>
-                    </div>
+        <!-- TOP APP BAR -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="brand-badge">
+                    <i class="ph-fill ph-trophy"></i>
                 </div>
-                <div class="date-selector-card">
+                <div class="brand-meta">
+                    <div class="brand-title-row">
+                        <span class="brand-name">ACE CUP</span>
+                        <div id="db-status-pill" class="db-status-pill online" title="Trạng thái kết nối Cloud Database">
+                            <span class="status-dot"></span>
+                            <span id="db-status-text">Cloud</span>
+                        </div>
+                    </div>
+                    <span class="brand-venue">Sân DE Badminton</span>
+                </div>
+            </div>
+
+            <div class="top-bar-right">
+                <!-- Admin Status / Auth Toggle -->
+                <button id="btn-admin-toggle" class="admin-auth-btn" title="Xác thực quyền Quản Trị Viên">
+                    <i class="ph-bold ph-lock-key" id="admin-btn-icon"></i>
+                    <span id="admin-btn-label">Admin</span>
+                </button>
+
+                <!-- Date Picker & Refresh -->
+                <div class="date-capsule">
                     <i class="ph-bold ph-calendar-blank"></i>
                     <input type="date" id="tournament-date" title="Chọn ngày giải đấu">
-                    <button id="btn-refresh" title="Làm mới dữ liệu từ máy chủ">
+                    <button id="btn-refresh" class="btn-icon-refresh" title="Làm mới dữ liệu từ máy chủ">
                         <i class="ph-bold ph-arrows-clockwise"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- TOURNAMENT HERO SHOWCASE BANNER -->
-        <section class="tournament-hero">
-            <div class="hero-glow-orb orb-1"></div>
-            <div class="hero-glow-orb orb-2"></div>
-            <div class="hero-card">
-                <div class="hero-content">
-                    <div class="hero-badge-wrap">
-                        <span class="hero-live-pill"><span class="pulsing-dot"></span> SỰ KIỆN SÂN ĐẤU</span>
-                        <span class="hero-tag"><i class="ph-fill ph-trophy"></i> DE BADMINTON 2026</span>
-                    </div>
-                    <h2 class="hero-title">Giải Cầu Lông Giao Lưu <span class="text-gradient">ACE CUP</span></h2>
-                    <p class="hero-subtitle">12 tay vợt xuất sắc • Bốc thăm công bằng tuyệt đối • Pha cầu kịch tính nghẹt thở</p>
-                    
-                    <div class="hero-chips">
-                        <div class="hero-chip">
-                            <i class="ph-fill ph-users"></i>
-                            <div><strong>12</strong> VĐV</div>
-                        </div>
-                        <div class="hero-chip">
-                            <i class="ph-fill ph-fire"></i>
-                            <div><strong>12</strong> Trận Đấu</div>
-                        </div>
-                        <div class="hero-chip">
-                            <i class="ph-fill ph-medal"></i>
-                            <div><strong>3</strong> Cặp Huy Chương</div>
-                        </div>
-                        <div class="hero-chip">
-                            <i class="ph-fill ph-scales"></i>
-                            <div><strong>H2H</strong> Chuẩn Quốc Tế</div>
-                        </div>
-                    </div>
-
-                    <div class="hero-actions">
-                        <button class="hero-btn-primary" onclick="openLightbox(1)">
-                            <i class="ph-bold ph-arrows-out"></i> Xem Ảnh Vinh Danh Toàn Đội
-                        </button>
-                        <button class="hero-btn-secondary" onclick="document.querySelector('[data-target=\'matches-tab\']').click()">
-                            <i class="ph-bold ph-sword"></i> Xem Lịch Thi Đấu
-                        </button>
-                    </div>
+        <!-- SLIM HERO BANNER -->
+        <section class="slim-hero">
+            <div class="hero-bg-media">
+                <img src="assets/photo_2.jpg" alt="ACE Cup Badminton Tournament" id="hero-bg-img">
+                <div class="hero-overlay"></div>
+            </div>
+            
+            <div class="hero-content">
+                <div class="hero-header-row">
+                    <span class="hero-tag">GIẢI CẦU LÔNG ĐÔI NAM NỮ 2026</span>
+                    <span id="tournament-state-chip" class="state-chip state-before">
+                        <span class="chip-dot"></span> <span id="state-chip-text">Sẵn sàng bốc thăm</span>
+                    </span>
                 </div>
 
-                <div class="hero-visual">
-                    <div class="hero-img-container clickable-photo" data-photo-idx="1" id="hero-img-card" title="Bấm để phóng to ảnh toàn đội">
-                        <img src="assets/photo_2.jpg" alt="DE Badminton Champion Celebration" class="hero-photo" id="hero-banner-img">
-                        <div class="hero-img-badge">
-                            <i class="ph-fill ph-crown"></i> Vinh danh tập thể ACE CUP
-                        </div>
-                        <div class="hero-zoom-hint">
-                            <i class="ph-bold ph-arrows-out"></i> Bấm xem ảnh lớn
-                        </div>
-                    </div>
+                <h1 class="hero-headline">ACE CUP 2026</h1>
+                
+                <div class="hero-info-line">
+                    <span><i class="ph-bold ph-map-pin"></i> Sân DE Badminton</span>
+                    <span class="hero-dot-separator">•</span>
+                    <span><i class="ph-bold ph-calendar"></i> <strong id="hero-date-display">Hôm nay</strong></span>
+                </div>
+
+                <!-- Single Primary CTA that changes dynamically by tournament state -->
+                <div class="hero-cta-wrap">
+                    <button id="hero-primary-cta" class="hero-primary-cta-btn">
+                        <i class="ph-bold ph-shuffle" id="hero-cta-icon"></i>
+                        <span id="hero-cta-text">Bốc Thăm Thi Đấu</span>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- GLOBAL TOURNAMENT PHOTO RIBBON (SCROLLABLE & CLICKABLE) -->
-        <div class="photo-ticker-container">
-            <div class="photo-ticker-header">
-                <span class="ticker-title"><i class="ph-fill ph-camera"></i> KHOẢNH KHẮC GIẢI ĐẤU (12 ẢNH SÂN ĐẤU &amp; TRAO GIẢI)</span>
-                <span class="ticker-hint"><i class="ph-bold ph-cursor-click"></i> Bấm ảnh bất kỳ để phóng to</span>
-            </div>
-            <div class="photo-ticker-track" id="photo-ticker-track">
-                <!-- Injected via JS or pre-rendered -->
-            </div>
-        </div>
-
-        <nav class="tabs">
-            <button class="tab-btn active" data-target="players-tab"><i class="ph-bold ph-users-three"></i> <span>Người chơi</span></button>
-            <button class="tab-btn" data-target="matches-tab"><i class="ph-bold ph-calendar-check"></i> <span>Lịch đấu</span></button>
-            <button class="tab-btn" data-target="leaderboard-tab"><i class="ph-bold ph-ranking"></i> <span>Bảng xếp hạng</span></button>
-        </nav>
-
-        <main class="tab-content-container">
-            <!-- PLAYERS TAB -->
-            <section id="players-tab" class="tab-content active">
-                <div class="card">
-                    <div class="card-header">
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- 1. TAB: NGƯỜI CHƠI -->
+            <section id="players-tab" class="tab-view active">
+                <div class="section-card">
+                    <div class="section-card-header">
                         <div>
-                            <h2>Danh sách Vận Động Viên</h2>
-                            <p class="subtitle">Bốc thăm tự động phân bổ đồng đội &amp; đối thủ công bằng 100%.</p>
+                            <h2 class="section-heading">Danh Sách VĐV</h2>
+                            <p class="section-subtext">Điểm danh tay vợt tham gia hôm nay</p>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <span class="badge" id="player-count-badge">0 VĐV tham gia</span>
-                            <div class="player-quick-tools">
-                                <button id="btn-select-all" class="mini-tool-btn" title="Chọn tất cả tham gia"><i class="ph-bold ph-checks"></i> Chọn hết</button>
-                                <button id="btn-deselect-all" class="mini-tool-btn" title="Bỏ chọn tất cả"><i class="ph-bold ph-x"></i> Bỏ hết</button>
+                        <div class="header-tools">
+                            <span class="player-stat-badge" id="player-count-badge">12 VĐV (6 Nam • 6 Nữ)</span>
+                            <div class="quick-toggle-btns">
+                                <button id="btn-select-all" class="pill-btn secondary" title="Chọn tất cả">
+                                    <i class="ph-bold ph-checks"></i> Chọn hết
+                                </button>
+                                <button id="btn-deselect-all" class="pill-btn secondary" title="Bỏ chọn tất cả">
+                                    <i class="ph-bold ph-x"></i> Bỏ hết
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Players Tab Photo Highlights -->
-                    <div class="tab-photo-duo">
-                        <div class="inline-photo-card clickable-photo" data-photo-idx="7" title="Bấm xem ảnh lớn">
-                            <div class="inline-photo-wrap">
-                                <img src="assets/photo_8.jpg" alt="Khởi động trước giờ thi đấu">
-                                <span class="photo-overlay-tag court"><i class="ph-fill ph-tennis-ball"></i> Sân Đấu DE</span>
-                            </div>
-                            <div class="inline-photo-caption">
-                                <strong>Khởi Động &amp; Tinh Thần Tranh Tài</strong>
-                                <span>12 tay vợt hội tụ đầy năng lượng trên thảm xanh</span>
-                            </div>
-                        </div>
-                        <div class="inline-photo-card clickable-photo" data-photo-idx="6" title="Bấm xem ảnh lớn">
-                            <div class="inline-photo-wrap">
-                                <img src="assets/photo_7.jpg" alt="Đội hình 12 VĐV vui vẻ">
-                                <span class="photo-overlay-tag court"><i class="ph-fill ph-users"></i> Đội Hình ACE Cup</span>
-                            </div>
-                            <div class="inline-photo-caption">
-                                <strong>Nụ Cười Rạng Rỡ Trước Giờ G</strong>
-                                <span>Sẵn sàng cho những màn so tài công bằng &amp; kịch tính</span>
-                            </div>
-                        </div>
+                    <div id="players-list" class="players-grid">
+                        <!-- Rendered by JS -->
                     </div>
-                    
-                    <div id="players-list">
-                        <!-- Player rows will be generated by JS -->
-                    </div>
-                    
-                    <button id="btn-add-player" class="add-player-btn">
-                        <i class="ph-bold ph-plus-circle"></i> Thêm Vận Động Viên Mới
+
+                    <button id="btn-add-player" class="btn-add-member">
+                        <i class="ph-bold ph-plus-circle"></i> Thêm Vận Động Viên
                     </button>
 
-                    <!-- Motivational Banner before Draw -->
-                    <div class="draw-motivational-banner clickable-photo" data-photo-idx="0" title="Bấm xem ảnh toàn đội">
-                        <div class="moti-img-wrap">
-                            <img src="assets/photo_1.jpg" alt="Tập thể nhận giải thưởng">
-                            <span class="photo-overlay-tag awards"><i class="ph-fill ph-trophy"></i> Đích Đến Vinh Quang</span>
+                    <div class="draw-action-container">
+                        <button id="btn-draw" class="action-btn-draw">
+                            <i class="ph-bold ph-shuffle"></i> BỐC THĂM TỰ ĐỘNG (~12 TRẬN)
+                        </button>
+                        <p class="draw-note">
+                            <i class="ph-fill ph-scales"></i> Thuật toán tối ưu đảm bảo 0% trùng đồng đội &amp; 0% trùng đối thủ
+                        </p>
+                        <div id="draw-error" class="error-alert" style="display: none;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. TAB: LỊCH ĐẤU -->
+            <section id="matches-tab" class="tab-view">
+                <div class="section-card">
+                    <div class="section-card-header match-header-wrap">
+                        <div>
+                            <h2 class="section-heading">Lịch Thi Đấu &amp; Tỷ Số</h2>
+                            <p class="section-subtext">Cập nhật trực tiếp kết quả từng trận</p>
                         </div>
-                        <div class="moti-content">
-                            <h3>Đấu Hết Sức • Vui Hết Mình • Rinh Trọn Huy Chương</h3>
-                            <p>Bấm nút bên dưới để hệ thống bốc thăm chia cặp đấu ngẫu nhiên công bằng 100%!</p>
+                        <div class="match-header-actions">
+                            <button id="btn-reset-draw" class="destructive-btn" title="Hủy bốc thăm và xóa điểm">
+                                <i class="ph-bold ph-arrow-counter-clockwise"></i> Hủy bốc thăm
+                            </button>
                         </div>
                     </div>
 
-                    <div class="action-bar">
-                        <button id="btn-draw" class="primary-btn">
-                            <i class="ph-bold ph-shuffle"></i> Bốc Thăm Tự Động (~12 trận)
+                    <!-- Round-grouped Match Cards Container -->
+                    <div id="rounds-container" class="rounds-container">
+                        <!-- Populated by JS or Empty State -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. TAB: BẢNG XẾP HẠNG -->
+            <section id="leaderboard-tab" class="tab-view">
+                <div class="section-card">
+                    <div class="section-card-header">
+                        <div>
+                            <h2 class="section-heading">Bảng Xếp Hạng</h2>
+                            <p class="section-subtext">Bục vinh quang &amp; xếp hạng chi tiết</p>
+                        </div>
+                    </div>
+
+                    <!-- Tiebreak Legend Banner -->
+                    <div class="tiebreak-legend">
+                        <i class="ph-fill ph-info"></i>
+                        <span><strong>Tiêu chí xếp hạng:</strong> Thắng &gt; Đối đầu trực tiếp (H2H) &gt; Hiệu số (+/-) &gt; Tổng điểm ghi</span>
+                    </div>
+
+                    <!-- Segmented Control for Male / Female Switch -->
+                    <div class="segmented-control" role="tablist">
+                        <button class="segment-btn active" data-gender="M" id="seg-btn-male" role="tab" aria-selected="true">
+                            <i class="ph-fill ph-gender-male"></i> BẢNG NAM
+                        </button>
+                        <button class="segment-btn" data-gender="F" id="seg-btn-female" role="tab" aria-selected="false">
+                            <i class="ph-fill ph-gender-female"></i> BẢNG NỮ
                         </button>
                     </div>
-                    <div id="draw-error" class="error-msg" style="display: none;"></div>
-                </div>
-            </section>
 
-            <!-- MATCHES TAB -->
-            <section id="matches-tab" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2>Lịch Thi Đấu</h2>
-                            <p class="subtitle">Nhập điểm từng ván - Bảng xếp hạng cập nhật tự động tức thì</p>
-                        </div>
-                        <button id="btn-reset-draw" class="danger-btn"><i class="ph-bold ph-arrow-counter-clockwise"></i> Hủy bốc thăm</button>
+                    <!-- Top 3 Visual Olympic Podium -->
+                    <div class="podium-container" id="podium-view">
+                        <!-- Rendered by JS -->
                     </div>
 
-                    <!-- Matches Tab Action Photo Highlights -->
-                    <div class="tab-photo-duo">
-                        <div class="inline-photo-card clickable-photo" data-photo-idx="3" title="Bấm xem ảnh lớn">
-                            <div class="inline-photo-wrap">
-                                <img src="assets/photo_4.jpg" alt="Pha đỡ cầu giáp sắt nón bảo hiểm">
-                                <span class="photo-overlay-tag court"><i class="ph-fill ph-shield-check"></i> Độc Nhất Vô Nhị</span>
-                            </div>
-                            <div class="inline-photo-caption">
-                                <strong>Pha Thủ Cầu "Full Giáp Nón Bảo Hiểm"</strong>
-                                <span>Chiến thuật độc lạ khiến cả sân cười ngả nghiêng</span>
-                            </div>
+                    <!-- Rest of Standings Table (Sticky Column for Rank & Name) -->
+                    <div class="table-card">
+                        <div class="table-card-title">
+                            <span id="table-view-title"><i class="ph-bold ph-list-numbers"></i> Danh sách chi tiết</span>
                         </div>
-                        <div class="inline-photo-card clickable-photo" data-photo-idx="4" title="Bấm xem ảnh lớn">
-                            <div class="inline-photo-wrap">
-                                <img src="assets/photo_5.jpg" alt="Năng lượng bùng cháy">
-                                <span class="photo-overlay-tag awards"><i class="ph-fill ph-fire"></i> Sân Đấu Rực Lửa</span>
-                            </div>
-                            <div class="inline-photo-caption">
-                                <strong>Năng Lượng Bùng Cháy Từng Hiệp Đấu</strong>
-                                <span>Quyết tâm bứt phá từng điểm số để vươn lên dẫn đầu</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="rounds-container">
-                        <div class="empty-state">
-                            <i class="ph ph-calendar-x"></i>
-                            <p>Chưa có lịch thi đấu. Hãy sang mục "Người chơi" để bốc thăm.</p>
+                        <div class="table-scroll-container">
+                            <table class="standings-table" id="standings-table">
+                                <thead>
+                                    <tr>
+                                        <th class="th-sticky">Vận động viên</th>
+                                        <th>Trận</th>
+                                        <th>Thắng</th>
+                                        <th>Thua</th>
+                                        <th>Hiệu số</th>
+                                        <th>Điểm ghi</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="standings-tbody">
+                                    <!-- Rendered by JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- LEADERBOARD TAB -->
-            <section id="leaderboard-tab" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
+            <!-- 4. TAB: KỶ NIỆM (DEDICATED GALLERY PAGE) -->
+            <section id="gallery-tab" class="tab-view">
+                <div class="section-card">
+                    <div class="section-card-header">
                         <div>
-                            <h2>Bảng Tổng Sắp</h2>
-                            <p class="subtitle">Xếp hạng riêng biệt Nam và Nữ theo chuẩn thi đấu quốc tế</p>
+                            <h2 class="section-heading">Kỷ Niệm Giải Đấu</h2>
+                            <p class="section-subtext">Trọn bộ 12 khoảnh khắc sân đấu, trao giải &amp; hậu trường</p>
                         </div>
+                        <span class="badge-accent">12 Khoảnh Khắc</span>
                     </div>
 
-                    <!-- Tournament Stats Overview -->
-                    <div class="stats-overview-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon blue"><i class="ph-fill ph-tennis-ball"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">Tổng số trận</span>
-                                <strong class="stat-val" id="stat-total-matches">0</strong>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon green"><i class="ph-fill ph-check-circle"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">Đã hoàn tất</span>
-                                <strong class="stat-val" id="stat-finished-matches">0</strong>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon orange"><i class="ph-fill ph-hourglass-high"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">Đang chờ đấu</span>
-                                <strong class="stat-val" id="stat-pending-matches">0</strong>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon purple"><i class="ph-fill ph-crown"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">Dẫn đầu (Nam • Nữ)</span>
-                                <strong class="stat-val" id="stat-top-players" style="font-size: 0.95rem;">-</strong>
-                            </div>
-                        </div>
+                    <!-- Gallery Filter Chips -->
+                    <div class="gallery-filter-chips">
+                        <button class="filter-chip active" data-filter="all">Tất cả (12)</button>
+                        <button class="filter-chip" data-filter="awards">Trao giải (7)</button>
+                        <button class="filter-chip" data-filter="court">Sân đấu (3)</button>
+                        <button class="filter-chip" data-filter="fun">Hậu trường (2)</button>
                     </div>
 
-                    <div class="ranking-rule-banner">
-                        <i class="ph-fill ph-scales"></i>
-                        <div class="rule-text">
-                            <strong>Tiêu chí phân hạng:</strong> Số trận thắng &gt; Đối đầu trực tiếp (H2H) &gt; Hiệu số điểm (+/-) &gt; Tổng điểm ghi được
-                        </div>
-                    </div>
-
-                    <!-- TOP 3 PODIUM PHOTO SHOWCASE -->
-                    <div class="podium-showcase-trio">
-                        <div class="podium-trio-card clickable-photo" data-photo-idx="2" title="Bấm xem ảnh lớn">
-                            <div class="podium-trio-thumb">
-                                <img src="assets/photo_3.jpg" alt="3 Cặp Đôi Đoạt Huy Chương">
-                                <span class="podium-tag bronze"><i class="ph-fill ph-medal"></i> 3 Cặp Đôi Vô Địch</span>
-                            </div>
-                            <div class="podium-trio-info">
-                                <strong>Bộ Ba Cặp Đôi Đoạt Huy Chương</strong>
-                                <span>Vàng • Bạc • Đồng tỏa sáng tại sân DE</span>
-                            </div>
-                        </div>
-
-                        <div class="podium-trio-card featured clickable-photo" data-photo-idx="8" title="Bấm xem ảnh lớn">
-                            <div class="podium-trio-thumb">
-                                <img src="assets/photo_9.jpg" alt="Bục Trao Giải Huy Chương">
-                                <span class="podium-tag gold"><i class="ph-fill ph-crown"></i> Bục Trao Giải Danh Giá</span>
-                            </div>
-                            <div class="podium-trio-info">
-                                <strong>Khoảnh Khắc Nhận Huy Chương</strong>
-                                <span>Phần thưởng xứng đáng cho những nỗ lực bứt phá</span>
-                            </div>
-                        </div>
-
-                        <div class="podium-trio-card clickable-photo" data-photo-idx="5" title="Bấm xem ảnh lớn">
-                            <div class="podium-trio-thumb">
-                                <img src="assets/photo_6.jpg" alt="Top 6 Tay Vợt Xuất Sắc">
-                                <span class="podium-tag silver"><i class="ph-fill ph-sparkle"></i> Top 6 VĐV Xuất Sắc</span>
-                            </div>
-                            <div class="podium-trio-info">
-                                <strong>Top 6 Tay Vợt Đoạt Huy Chương</strong>
-                                <span>Nụ cười rạng rỡ của các nhà vô địch</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sub-tabs for filtering Male / Female on mobile -->
-                    <div class="leaderboard-filter-tabs">
-                        <button class="filter-tab-btn active" data-filter="all"><i class="ph-bold ph-rows"></i> Xem tất cả</button>
-                        <button class="filter-tab-btn" data-filter="male"><i class="ph-fill ph-gender-male"></i> Bảng Nam</button>
-                        <button class="filter-tab-btn" data-filter="female"><i class="ph-fill ph-gender-female"></i> Bảng Nữ</button>
-                    </div>
-
-                    <div class="leaderboard-section" id="section-table-male">
-                        <div class="section-title male-title">
-                            <i class="ph-fill ph-gender-male"></i>
-                            <span>Bảng Xếp Hạng Nam</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="leaderboard-table-male" class="leaderboard-table">
-                                <thead>
-                                    <tr>
-                                        <th class="th-rank">Hạng</th>
-                                        <th class="th-name">Vận động viên</th>
-                                        <th class="th-stat">Trận</th>
-                                        <th class="th-stat th-win">Thắng</th>
-                                        <th class="th-stat th-loss">Thua</th>
-                                        <th class="th-stat th-diff">Hiệu số</th>
-                                        <th class="th-stat th-pts">Tổng điểm</th>
-                                        <th class="th-notes">Ghi chú</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="8" class="text-center">Chưa có dữ liệu</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="leaderboard-section" id="section-table-female" style="margin-top: 30px;">
-                        <div class="section-title female-title">
-                            <i class="ph-fill ph-gender-female"></i>
-                            <span>Bảng Xếp Hạng Nữ</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="leaderboard-table-female" class="leaderboard-table">
-                                <thead>
-                                    <tr>
-                                        <th class="th-rank">Hạng</th>
-                                        <th class="th-name">Vận động viên</th>
-                                        <th class="th-stat">Trận</th>
-                                        <th class="th-stat th-win">Thắng</th>
-                                        <th class="th-stat th-loss">Thua</th>
-                                        <th class="th-stat th-diff">Hiệu số</th>
-                                        <th class="th-stat th-pts">Tổng điểm</th>
-                                        <th class="th-notes">Ghi chú</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="8" class="text-center">Chưa có dữ liệu</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- TOURNAMENT MEMORIES & AFTER-PARTY STRIP -->
-                    <div class="tournament-memories-card">
-                        <div class="memories-header">
-                            <div class="section-title" style="margin-bottom: 0;">
-                                <i class="ph-fill ph-heart"></i>
-                                <span>Kỷ Niệm &amp; Hậu Trường Sau Giải Đấu</span>
-                            </div>
-                            <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: #f472b6; border-color: rgba(244, 114, 182, 0.3);">ACE Cup Moments</span>
-                        </div>
-                        <div class="memories-grid">
-                            <div class="memory-item clickable-photo" data-photo-idx="9" title="Bấm xem ảnh lớn">
-                                <div class="memory-thumb">
-                                    <img src="assets/photo_10.jpg" alt="Trao phong bì và giải thưởng">
-                                    <span class="photo-overlay-tag awards"><i class="ph-fill ph-gift"></i> Trao Thưởng</span>
-                                </div>
-                                <div class="memory-info">
-                                    <strong>Phong Bì &amp; Huy Chương Trao Tay</strong>
-                                    <span>Phần thưởng ngọt ngào cho những nỗ lực bứt phá</span>
-                                </div>
-                            </div>
-                            <div class="memory-item clickable-photo" data-photo-idx="10" title="Bấm xem ảnh lớn">
-                                <div class="memory-thumb">
-                                    <img src="assets/photo_11.jpg" alt="Quây quần sau trận">
-                                    <span class="photo-overlay-tag fun"><i class="ph-fill ph-coffee"></i> Nghỉ Ngơi</span>
-                                </div>
-                                <div class="memory-info">
-                                    <strong>Quây Quần Chilling Sau Loạt Trận</strong>
-                                    <span>Những giây phút nghỉ ngơi, trò chuyện rôm rả</span>
-                                </div>
-                            </div>
-                            <div class="memory-item clickable-photo" data-photo-idx="11" title="Bấm xem ảnh lớn">
-                                <div class="memory-thumb">
-                                    <img src="assets/photo_12.jpg" alt="Selfie toàn đội">
-                                    <span class="photo-overlay-tag fun"><i class="ph-fill ph-camera"></i> Kỷ Niệm Đẹp</span>
-                                </div>
-                                <div class="memory-info">
-                                    <strong>Selfie Toàn Đội - Tình Bạn Bền Lâu</strong>
-                                    <span>Gắn kết tình bạn qua từng pha cầu bùng nổ</span>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Masonry Grid for 12 Photos -->
+                    <div class="gallery-masonry-grid" id="gallery-masonry">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </section>
         </main>
+
+        <!-- MOBILE-FIRST BOTTOM NAVIGATION BAR -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" data-target="players-tab">
+                <i class="ph-bold ph-users-three"></i>
+                <span>Người chơi</span>
+            </button>
+            <button class="bottom-nav-item" data-target="matches-tab">
+                <i class="ph-bold ph-sword"></i>
+                <span>Lịch đấu</span>
+            </button>
+            <button class="bottom-nav-item" data-target="leaderboard-tab">
+                <i class="ph-bold ph-ranking"></i>
+                <span>Xếp hạng</span>
+            </button>
+            <button class="bottom-nav-item" data-target="gallery-tab">
+                <i class="ph-bold ph-images"></i>
+                <span>Kỷ niệm</span>
+            </button>
+        </nav>
     </div>
 
-    <!-- Custom Confirm Modal -->
+    <!-- ADMIN BOTTOM SHEET MODAL -->
+    <div id="admin-sheet-modal" class="bottom-sheet-overlay" style="display: none;">
+        <div class="bottom-sheet-backdrop" id="admin-sheet-backdrop"></div>
+        <div class="bottom-sheet-panel">
+            <div class="bottom-sheet-handle"></div>
+            <div class="bottom-sheet-header">
+                <div class="admin-icon-ring">
+                    <i class="ph-fill ph-lock-key"></i>
+                </div>
+                <h3>Xác Thực Quản Trị Viên</h3>
+                <p>Nhập mật khẩu Admin để bốc thăm, hủy lịch hoặc nhập điểm số.</p>
+            </div>
+            <div class="bottom-sheet-body">
+                <div class="input-field-wrap">
+                    <i class="ph-bold ph-password input-icon"></i>
+                    <input type="password" id="admin-password" placeholder="Nhập mật khẩu..." autocomplete="current-password" autofocus>
+                </div>
+                <div id="admin-error" class="error-alert" style="display: none; margin-top: 10px;">
+                    Mật khẩu không đúng, vui lòng thử lại!
+                </div>
+                <div class="bottom-sheet-actions">
+                    <button id="btn-cancel-admin" class="sheet-btn secondary">Hủy bỏ</button>
+                    <button id="btn-confirm-admin" class="sheet-btn primary">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DESTRUCTIVE CONFIRM MODAL -->
     <div id="confirm-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content confirm-modal-box">
-            <div class="confirm-icon-wrap" id="confirm-icon-wrap">
+        <div class="modal-card">
+            <div class="confirm-icon-danger">
                 <i class="ph-bold ph-warning"></i>
             </div>
-            <h3 id="confirm-title">Xác nhận</h3>
-            <p id="confirm-msg" style="margin: 10px 0 20px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;"></p>
-            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button id="btn-cancel-confirm" class="secondary-btn" style="flex: 1;">Hủy bỏ</button>
-                <button id="btn-ok-confirm" class="danger-btn" style="flex: 1; justify-content: center;">Đồng ý</button>
+            <h3 id="confirm-title">Xác nhận thao tác</h3>
+            <p id="confirm-msg">Hành động này sẽ thay đổi dữ liệu hiện tại.</p>
+            <div class="modal-btn-row">
+                <button id="btn-cancel-confirm" class="sheet-btn secondary">Hủy bỏ</button>
+                <button id="btn-ok-confirm" class="sheet-btn danger">Đồng ý</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <!-- Admin Auth Modal -->
-    <div id="admin-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h3><i class="ph-fill ph-lock-key"></i> Xác thực Admin</h3>
-            <p style="margin: 10px 0; color: var(--text-muted); font-size: 0.9rem;">Vui lòng nhập mật khẩu để thực hiện thao tác này.</p>
-            <input type="password" id="admin-password" placeholder="Mật khẩu..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--bg-dark); color: white; margin-bottom: 15px; outline: none;">
-            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button id="btn-cancel-admin" class="secondary-btn" style="flex: 1;">Hủy</button>
-                <button id="btn-confirm-admin" class="primary-btn" style="flex: 1; justify-content: center;">Xác nhận</button>
-            </div>
-            <p id="admin-error" class="error-msg" style="display: none; margin-top: 10px;">Mật khẩu không đúng!</p>
-        </div>
-    </div>
-
-    <!-- Image Lightbox Modal -->
+    <!-- SWIPEABLE LIGHTBOX MODAL -->
     <div id="lightbox-modal" class="lightbox-overlay" style="display: none;">
         <button class="lightbox-close-btn" id="lightbox-close" title="Đóng (ESC)">
             <i class="ph-bold ph-x"></i>
         </button>
+        
         <button class="lightbox-nav-btn prev" id="lightbox-prev" title="Ảnh trước (←)">
             <i class="ph-bold ph-caret-left"></i>
         </button>
-        <div class="lightbox-content-wrap">
-            <div class="lightbox-img-frame">
+
+        <div class="lightbox-stage" id="lightbox-stage">
+            <div class="lightbox-image-wrap">
                 <img id="lightbox-img" src="" alt="Khoảnh khắc giải đấu">
             </div>
-            <div class="lightbox-info-bar">
-                <div class="lightbox-meta">
-                    <span class="lightbox-category" id="lightbox-category">Trao giải</span>
+            <div class="lightbox-details">
+                <div class="lightbox-meta-top">
+                    <span class="lightbox-badge" id="lightbox-category">Trao giải</span>
                     <span class="lightbox-counter" id="lightbox-counter">1 / 12</span>
                 </div>
                 <h4 class="lightbox-title" id="lightbox-title">DE Badminton</h4>
-                <p class="lightbox-caption" id="lightbox-caption">Khoảnh khắc ấn tượng giải đấu</p>
+                <p class="lightbox-desc" id="lightbox-caption">Khoảnh khắc ấn tượng giải đấu</p>
+                <div class="lightbox-swipe-hint">
+                    <i class="ph-bold ph-arrows-left-right"></i> Vuốt trái / phải để chuyển ảnh
+                </div>
             </div>
         </div>
+
         <button class="lightbox-nav-btn next" id="lightbox-next" title="Ảnh tiếp theo (→)">
             <i class="ph-bold ph-caret-right"></i>
         </button>
     </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
 
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
