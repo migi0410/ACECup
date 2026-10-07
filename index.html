@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="orange">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -31,6 +31,34 @@
             </div>
 
             <div class="top-bar-right">
+                <!-- Theme Palette Switcher -->
+                <div class="theme-dropdown-wrap">
+                    <button id="btn-theme-toggle" class="theme-toggle-btn" title="Đổi tông màu giao diện">
+                        <i class="ph-bold ph-palette"></i>
+                    </button>
+                    <div id="theme-menu" class="theme-menu-popover" style="display: none;">
+                        <span class="theme-menu-title">Tông màu giao diện</span>
+                        <div class="theme-options-grid">
+                            <button class="theme-option-btn active" data-theme="orange">
+                                <span class="color-dot orange"></span>
+                                <span>Cam Lửa</span>
+                            </button>
+                            <button class="theme-option-btn" data-theme="cyan">
+                                <span class="color-dot cyan"></span>
+                                <span>Băng Lam</span>
+                            </button>
+                            <button class="theme-option-btn" data-theme="lime">
+                                <span class="color-dot lime"></span>
+                                <span>Lục Bảo</span>
+                            </button>
+                            <button class="theme-option-btn" data-theme="gold">
+                                <span class="color-dot gold"></span>
+                                <span>Hoàng Kim</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Admin Status / Auth Toggle -->
                 <button id="btn-admin-toggle" class="admin-auth-btn" title="Xác thực quyền Quản Trị Viên">
                     <i class="ph-bold ph-lock-key" id="admin-btn-icon"></i>
@@ -133,6 +161,10 @@
                             <p class="section-subtext">Cập nhật trực tiếp kết quả từng trận</p>
                         </div>
                         <div class="match-header-actions">
+                            <!-- NÚT IN BẢNG ĐẤU -->
+                            <button id="btn-print-schedule" class="print-schedule-btn" title="In bảng thi đấu hoặc xuất file PDF">
+                                <i class="ph-bold ph-printer"></i> In Bảng Đấu
+                            </button>
                             <button id="btn-reset-draw" class="destructive-btn" title="Hủy bốc thăm và xóa điểm">
                                 <i class="ph-bold ph-arrow-counter-clockwise"></i> Hủy bốc thăm
                             </button>
@@ -293,6 +325,55 @@
                 <button id="btn-ok-confirm" class="sheet-btn danger">Đồng ý</button>
             </div>
         </div>
+    </div>
+
+    <!-- PRINT MODAL & PREVIEW DIALOG -->
+    <div id="print-modal" class="modal-overlay" style="display: none;">
+        <div class="print-modal-card">
+            <div class="print-modal-header">
+                <div class="print-title-wrap">
+                    <div class="print-icon-badge"><i class="ph-bold ph-printer"></i></div>
+                    <div>
+                        <h3>In Bảng Thi Đấu &amp; Biên Bản</h3>
+                        <p class="print-subtitle">Chuẩn A4 cho trọng tài ghi điểm hoặc dán bảng thông báo</p>
+                    </div>
+                </div>
+                <button id="btn-close-print-modal" class="modal-close-btn" title="Đóng"><i class="ph-bold ph-x"></i></button>
+            </div>
+            
+            <div class="print-modal-body">
+                <div class="print-options-bar">
+                    <label class="print-radio-pill active">
+                        <input type="radio" name="print-mode" value="scoresheet" checked>
+                        <i class="ph-bold ph-pencil-simple"></i>
+                        <span>Biên bản chấm điểm (Ghi tay)</span>
+                    </label>
+                    <label class="print-radio-pill">
+                        <input type="radio" name="print-mode" value="results">
+                        <i class="ph-bold ph-trophy"></i>
+                        <span>Bảng kết quả &amp; BXH</span>
+                    </label>
+                </div>
+
+                <div class="print-preview-container">
+                    <div class="print-preview-paper" id="print-preview-frame">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="print-modal-actions">
+                <button id="btn-cancel-print" class="sheet-btn secondary">Đóng</button>
+                <button id="btn-do-print" class="sheet-btn primary">
+                    <i class="ph-bold ph-printer"></i> In Ngay / Xuất PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEDICATED PRINT SHEET CONTAINER (DISPLAYED IN @MEDIA PRINT) -->
+    <div id="print-sheet-container" class="print-sheet-container">
+        <!-- Injected dynamically for paper print engine -->
     </div>
 
     <!-- SWIPEABLE LIGHTBOX MODAL -->

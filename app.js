@@ -67,7 +67,63 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 2. MOBILE-FIRST TAB NAVIGATION
+    // 2. THEME ENGINE (ORANGE / CYAN / LIME / GOLD)
+    // ==========================================================================
+    const themeToggleBtn = document.getElementById('btn-theme-toggle');
+    const themeMenu = document.getElementById('theme-menu');
+    const themeOptionBtns = document.querySelectorAll('.theme-option-btn');
+
+    const themeNames = {
+        orange: 'Cam Lửa',
+        cyan: 'Băng Lam',
+        lime: 'Lục Bảo',
+        gold: 'Hoàng Kim'
+    };
+
+    function applyTheme(themeKey, notify = false) {
+        if (!themeNames[themeKey]) themeKey = 'orange';
+        document.documentElement.setAttribute('data-theme', themeKey);
+        localStorage.setItem('acecup_theme', themeKey);
+
+        themeOptionBtns.forEach(btn => {
+            if (btn.dataset.theme === themeKey) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        if (notify) {
+            showToast(`Đã đổi tông màu: ${themeNames[themeKey]}`, 'info');
+        }
+    }
+
+    // Initial theme load (default: 'orange')
+    const savedTheme = localStorage.getItem('acecup_theme') || 'orange';
+    applyTheme(savedTheme, false);
+
+    if (themeToggleBtn && themeMenu) {
+        themeToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = themeMenu.style.display === 'block';
+            themeMenu.style.display = isVisible ? 'none' : 'block';
+        });
+
+        themeOptionBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const chosen = btn.dataset.theme;
+                applyTheme(chosen, true);
+                themeMenu.style.display = 'none';
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!themeMenu.contains(e.target) && e.target !== themeToggleBtn) {
+                themeMenu.style.display = 'none';
+            }
+        });
+    }
+
+    // ==========================================================================
+    // 3. MOBILE-FIRST TAB NAVIGATION
     // ==========================================================================
     const navItems = document.querySelectorAll('.bottom-nav-item');
     const tabViews = document.querySelectorAll('.tab-view');
@@ -94,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================================================
-    // 3. ADMIN AUTHENTICATION & BOTTOM SHEET
+    // 4. ADMIN AUTHENTICATION & BOTTOM SHEET
     // ==========================================================================
     const adminSheetModal = document.getElementById('admin-sheet-modal');
     const adminSheetBackdrop = document.getElementById('admin-sheet-backdrop');
@@ -198,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateAdminUI();
 
     // ==========================================================================
-    // 4. DATE SELECTION & CLOUD / LOCAL SYNC
+    // 5. DATE SELECTION & CLOUD / LOCAL SYNC
     // ==========================================================================
     const dateInput = document.getElementById('tournament-date');
     const heroDateDisplay = document.getElementById('hero-date-display');
@@ -275,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const finishedMatches = state.matches ? state.matches.filter(m => m.isFinished).length : 0;
 
         if (totalMatches === 0) {
-            // State: Before Draw
             stateChip.className = 'state-chip state-before';
             if (stateText) stateText.textContent = 'Sẵn sàng bốc thăm';
             if (ctaText) ctaText.textContent = 'Bốc Thăm Thi Đấu';
@@ -286,14 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (btnDraw) btnDraw.scrollIntoView({ behavior: 'smooth' });
             };
         } else if (finishedMatches === totalMatches && totalMatches > 0) {
-            // State: Tournament Finished
             stateChip.className = 'state-chip state-finished';
             if (stateText) stateText.textContent = 'Đã hoàn tất giải';
             if (ctaText) ctaText.textContent = 'Xem Bục Vinh Quang';
             if (ctaIcon) ctaIcon.className = 'ph-bold ph-trophy';
             primaryCta.onclick = () => switchTab('leaderboard-tab');
         } else {
-            // State: Live Playing
             stateChip.className = 'state-chip state-live';
             if (stateText) stateText.textContent = `Đang đấu (${finishedMatches}/${totalMatches})`;
             if (ctaText) ctaText.textContent = 'Xem Trận Đang Đấu';
@@ -386,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 5. PLAYERS MANAGEMENT
+    // 6. PLAYERS MANAGEMENT
     // ==========================================================================
     const playersList = document.getElementById('players-list');
     const predefinedPlayers = [
@@ -529,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 6. DRAW TOURNAMENT OPTIMIZER (500-TRIALS ZERO-COLLISION ALGORITHM)
+    // 7. DRAW TOURNAMENT OPTIMIZER (500-TRIALS ZERO-COLLISION ALGORITHM)
     // ==========================================================================
     document.getElementById('btn-draw').addEventListener('click', () => {
         requireAdmin(() => {
@@ -757,7 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 7. MATCH CARDS & LARGE COURTSIDE STEPPERS
+    // 8. MATCH CARDS & LARGE COURTSIDE STEPPERS
     // ==========================================================================
     function renderMatches() {
         const container = document.getElementById('rounds-container');
@@ -1027,9 +1080,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================================================
-    // 8. STANDINGS, TOP 3 PODIUM & STICKY TABLE
+    // 9. STANDINGS, TOP 3 PODIUM & STICKY TABLE
     // ==========================================================================
-    function updateLeaderboard() {
+    function calculateStandings() {
         const stats = {};
         state.players.forEach(p => {
             stats[p.id] = { 
@@ -1122,6 +1175,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const males = Object.values(stats).filter(s => s.p.logicalGender === 'M').sort(sortFn);
         const females = Object.values(stats).filter(s => s.p.logicalGender === 'F').sort(sortFn);
 
+        return { males, females };
+    }
+
+    function updateLeaderboard() {
+        const { males, females } = calculateStandings();
         renderStandingsView(activeStandingsGender === 'M' ? males : females);
     }
 
@@ -1260,7 +1318,208 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 9. DEDICATED GALLERY (12 PHOTOS MASONRY GRID & SWIPEABLE LIGHTBOX)
+    // 10. PRINT TOURNAMENT SCHEDULE & SCORE SHEET (IN BẢNG ĐẤU)
+    // ==========================================================================
+    const btnPrintSchedule = document.getElementById('btn-print-schedule');
+    const printModal = document.getElementById('print-modal');
+    const btnClosePrintModal = document.getElementById('btn-close-print-modal');
+    const btnCancelPrint = document.getElementById('btn-cancel-print');
+    const btnDoPrint = document.getElementById('btn-do-print');
+    const printPreviewFrame = document.getElementById('print-preview-frame');
+    const printSheetContainer = document.getElementById('print-sheet-container');
+    const printRadioInputs = document.querySelectorAll('input[name="print-mode"]');
+
+    function generatePrintSheetHtml(mode = 'scoresheet') {
+        const dateStr = formatDisplayDate(dateInput ? dateInput.value : '');
+        const totalMatches = state.matches ? state.matches.length : 0;
+        const isScoresheet = (mode === 'scoresheet');
+
+        let html = `
+            <div class="print-paper-header">
+                <h1>ACE CUP 2026 • LỊCH THI ĐẤU &amp; BIÊN BẢN ĐIỂM SỐ</h1>
+                <div class="print-paper-meta">
+                    <span>📍 Địa điểm: Sân DE Badminton</span> &bull; 
+                    <span>📅 Ngày: <strong>${dateStr}</strong></span> &bull; 
+                    <span>🏸 Thể thức: Đôi Nam Nữ Giao Lưu (${totalMatches} trận)</span>
+                </div>
+            </div>
+
+            <div class="print-section-title">
+                ${isScoresheet ? '1. DANH SÁCH CÁC TRẬN ĐẤU &amp; PHIẾU CHẤM ĐIỂM TRỌNG TÀI' : '1. KẾT QUẢ CÁC TRẬN ĐẤU'}
+            </div>
+            
+            <table class="print-paper-table">
+                <thead>
+                    <tr>
+                        <th style="width: 38px;">STT</th>
+                        <th style="width: 45px;">Vòng</th>
+                        <th style="width: 50px;">Sân</th>
+                        <th style="width: 190px;">Đội 1 (Nam - Nữ)</th>
+                        <th style="width: 85px;">Tỷ Số</th>
+                        <th style="width: 190px;">Đội 2 (Nam - Nữ)</th>
+                        <th style="width: 80px;">Đội Thắng</th>
+                        <th style="width: 90px;">Ký Nhận</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        if (state.matches && state.matches.length > 0) {
+            state.matches.forEach(m => {
+                const court = m.court || (((m.id - 1) % 3) + 1);
+                const t1 = `${m.team1.m.name} & ${m.team1.f.name}`;
+                const t2 = `${m.team2.m.name} & ${m.team2.f.name}`;
+                
+                let scoreCol = '';
+                let winnerCol = '';
+                
+                if (isScoresheet) {
+                    scoreCol = `<span class="print-box-cell">&nbsp;</span> : <span class="print-box-cell">&nbsp;</span>`;
+                    winnerCol = `&nbsp;`;
+                } else {
+                    if (m.isFinished) {
+                        scoreCol = `<strong>${m.score1} - ${m.score2}</strong>`;
+                        winnerCol = m.score1 > m.score2 ? 'Đội 1' : (m.score2 > m.score1 ? 'Đội 2' : 'Hòa');
+                    } else {
+                        scoreCol = `<span style="color: #888;">Chưa đấu</span>`;
+                        winnerCol = `-`;
+                    }
+                }
+
+                html += `
+                    <tr>
+                        <td><strong>${m.id}</strong></td>
+                        <td>V${m.round}</td>
+                        <td>Sân ${court}</td>
+                        <td style="text-align: left; padding-left: 8px;">${t1}</td>
+                        <td>${scoreCol}</td>
+                        <td style="text-align: left; padding-left: 8px;">${t2}</td>
+                        <td><strong>${winnerCol}</strong></td>
+                        <td>&nbsp;</td>
+                    </tr>
+                `;
+            });
+        } else {
+            html += `<tr><td colspan="8" style="padding: 16px;">Chưa có dữ liệu thi đấu</td></tr>`;
+        }
+
+        html += `</tbody></table>`;
+
+        // Standings tables if results mode
+        if (!isScoresheet && state.matches && state.matches.length > 0) {
+            const { males, females } = calculateStandings();
+            
+            const renderTableSection = (title, list) => {
+                let sec = `
+                    <div class="print-section-title">${title}</div>
+                    <table class="print-paper-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 45px;">Hạng</th>
+                                <th style="width: 180px; text-align: left; padding-left: 8px;">Vận Động Viên</th>
+                                <th style="width: 50px;">Trận</th>
+                                <th style="width: 50px;">Thắng</th>
+                                <th style="width: 50px;">Thua</th>
+                                <th style="width: 60px;">Hiệu Số</th>
+                                <th style="width: 60px;">Tổng Điểm</th>
+                                <th style="width: 70px;">H2H</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                list.forEach((row, i) => {
+                    sec += `
+                        <tr>
+                            <td><strong>${i + 1}</strong></td>
+                            <td style="text-align: left; padding-left: 8px; font-weight: 600;">${row.p.name}</td>
+                            <td>${row.matches}</td>
+                            <td><strong>${row.wins}</strong></td>
+                            <td>${row.losses}</td>
+                            <td>${row.diff >= 0 ? '+' : ''}${row.diff}</td>
+                            <td><strong>${row.pts}</strong></td>
+                            <td>${row.h2hWonTiebreak ? 'Ưu tiên' : '-'}</td>
+                        </tr>
+                    `;
+                });
+                sec += `</tbody></table>`;
+                return sec;
+            };
+
+            html += renderTableSection('2. BẢNG XẾP HẠNG NAM', males);
+            html += renderTableSection('3. BẢNG XẾP HẠNG NỮ', females);
+        }
+
+        html += `
+            <div class="print-signatures-row">
+                <div class="sig-col">
+                    <strong>Đại Diện Vận Động Viên</strong>
+                    <div class="sig-line"></div>
+                    <span>(Ký &amp; ghi rõ họ tên)</span>
+                </div>
+                <div class="sig-col">
+                    <strong>Trọng Tài / Ban Tổ Chức</strong>
+                    <div class="sig-line"></div>
+                    <span>(Ký xác nhận biên bản)</span>
+                </div>
+            </div>
+
+            <div class="print-paper-footer">
+                <span>Hệ thống bốc thăm công bằng ACE Cup 2026 &bull; Tiêu chuẩn đối đầu trực tiếp H2H</span>
+                <span>Bản in lúc: ${new Date().toLocaleTimeString('vi-VN')} ngày ${dateStr}</span>
+            </div>
+        `;
+
+        return html;
+    }
+
+    function updatePrintPreviews() {
+        let selectedMode = 'scoresheet';
+        printRadioInputs.forEach(r => {
+            if (r.checked) selectedMode = r.value;
+            const parentPill = r.closest('.print-radio-pill');
+            if (parentPill) {
+                if (r.checked) parentPill.classList.add('active');
+                else parentPill.classList.remove('active');
+            }
+        });
+
+        const printHtml = generatePrintSheetHtml(selectedMode);
+        if (printPreviewFrame) printPreviewFrame.innerHTML = printHtml;
+        if (printSheetContainer) printSheetContainer.innerHTML = printHtml;
+    }
+
+    function openPrintModal() {
+        if (!state.matches || state.matches.length === 0) {
+            showToast('Chưa có lịch thi đấu để in. Hãy bốc thăm trước!', 'error');
+            switchTab('players-tab');
+            return;
+        }
+
+        updatePrintPreviews();
+        if (printModal) printModal.style.display = 'flex';
+    }
+
+    function closePrintModal() {
+        if (printModal) printModal.style.display = 'none';
+    }
+
+    if (btnPrintSchedule) btnPrintSchedule.addEventListener('click', openPrintModal);
+    if (btnClosePrintModal) btnClosePrintModal.addEventListener('click', closePrintModal);
+    if (btnCancelPrint) btnCancelPrint.addEventListener('click', closePrintModal);
+
+    printRadioInputs.forEach(radio => {
+        radio.addEventListener('change', updatePrintPreviews);
+    });
+
+    if (btnDoPrint) {
+        btnDoPrint.addEventListener('click', () => {
+            updatePrintPreviews();
+            window.print();
+        });
+    }
+
+    // ==========================================================================
+    // 11. DEDICATED GALLERY (12 PHOTOS MASONRY GRID & SWIPEABLE LIGHTBOX)
     // ==========================================================================
     const tournamentPhotos = [
         {
@@ -1492,13 +1751,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleLightboxSwipe() {
         const deltaX = touchEndX - touchStartX;
         const deltaY = touchEndY - touchStartY;
-        // Require horizontal swipe dominant over vertical
         if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
             if (deltaX < 0) {
-                // Swiped Left -> Next
                 nextPhoto();
             } else {
-                // Swiped Right -> Prev
                 prevPhoto();
             }
         }
