@@ -895,26 +895,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 let scoreControlHtml = '';
                 if (isAdmin) {
                     scoreControlHtml = `
-                        <div class="stepper-control-row">
-                            <div class="stepper-group">
-                                <span class="stepper-team-label">T1</span>
-                                <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 1, -1)">-</button>
-                                <input type="number" class="stepper-input" id="s1-${match.id}" value="${match.score1}" min="0" placeholder="0" oninput="markMatchPlaying(${match.id})">
-                                <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 1, 1)">+</button>
+                        <div class="stepper-control-box">
+                            <div class="stepper-teams-row">
+                                <div class="stepper-group">
+                                    <span class="stepper-team-label">T1</span>
+                                    <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 1, -1)">-</button>
+                                    <input type="number" class="stepper-input" id="s1-${match.id}" value="${match.score1}" min="0" placeholder="0" oninput="markMatchPlaying(${match.id})">
+                                    <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 1, 1)">+</button>
+                                </div>
+
+                                <span class="stepper-divider">:</span>
+
+                                <div class="stepper-group">
+                                    <span class="stepper-team-label">T2</span>
+                                    <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 2, -1)">-</button>
+                                    <input type="number" class="stepper-input" id="s2-${match.id}" value="${match.score2}" min="0" placeholder="0" oninput="markMatchPlaying(${match.id})">
+                                    <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 2, 1)">+</button>
+                                </div>
                             </div>
 
-                            <span class="vs-pill">:</span>
-
-                            <div class="stepper-group">
-                                <span class="stepper-team-label">T2</span>
-                                <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 2, -1)">-</button>
-                                <input type="number" class="stepper-input" id="s2-${match.id}" value="${match.score2}" min="0" placeholder="0" oninput="markMatchPlaying(${match.id})">
-                                <button type="button" class="stepper-btn" onclick="stepperStep(${match.id}, 2, 1)">+</button>
-                            </div>
-
-                            <div class="stepper-actions">
+                            <div class="stepper-action-row">
                                 <button class="btn-stepper-save" onclick="saveMatch(${match.id})" title="Lưu điểm số">
-                                    <i class="ph-bold ph-check"></i> Lưu
+                                    <i class="ph-bold ph-check"></i> Lưu kết quả
                                 </button>
                                 ${match.isFinished ? `
                                 <button class="btn-stepper-delete" onclick="clearMatchScore(${match.id})" title="Xóa điểm trận này">

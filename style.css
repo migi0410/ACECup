@@ -1243,16 +1243,25 @@ input:checked + .slider:before {
 }
 
 /* Courtside Large Stepper Score Inputs (Admin Only) */
+.stepper-control-box,
 .stepper-control-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: 8px 10px;
-    margin-top: 4px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.stepper-teams-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
 }
 
 .stepper-group {
@@ -1262,20 +1271,29 @@ input:checked + .slider:before {
 }
 
 .stepper-team-label {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    font-weight: 600;
-    margin-right: 4px;
+    font-weight: 700;
+    margin-right: 2px;
+}
+
+.stepper-divider,
+.stepper-control-row .vs-pill {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    padding: 0 4px;
 }
 
 .stepper-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border-subtle);
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -1283,6 +1301,8 @@ input:checked + .slider:before {
     cursor: pointer;
     touch-action: manipulation;
     transition: all 0.15s ease;
+    user-select: none;
+    flex-shrink: 0;
 }
 
 .stepper-btn:hover {
@@ -1297,7 +1317,7 @@ input:checked + .slider:before {
 
 .stepper-input {
     width: 44px;
-    height: 38px;
+    height: 36px;
     background: var(--bg-input);
     border: 1px solid var(--border-medium);
     border-radius: var(--radius-sm);
@@ -1321,29 +1341,34 @@ input:checked + .slider:before {
     box-shadow: 0 0 8px var(--accent-glow);
 }
 
+.stepper-action-row,
 .stepper-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-left: auto;
+    gap: 8px;
+    width: 100%;
 }
 
 .btn-stepper-save {
+    flex: 1;
     height: 38px;
-    padding: 0 12px;
+    padding: 0 14px;
     border-radius: var(--radius-sm);
     background: var(--accent-primary);
     border: none;
     color: var(--text-dark);
     font-family: var(--font-display);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 800;
     text-transform: uppercase;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     cursor: pointer;
+    box-shadow: 0 0 10px var(--accent-glow);
     transition: all 0.15s ease;
+    white-space: nowrap;
 }
 
 .btn-stepper-save:hover {
@@ -1363,11 +1388,32 @@ input:checked + .slider:before {
     justify-content: center;
     cursor: pointer;
     transition: all 0.15s ease;
+    flex-shrink: 0;
 }
 
 .btn-stepper-delete:hover {
     background: var(--accent-rose);
     color: #fff;
+}
+
+@media (min-width: 600px) {
+    .stepper-control-box {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .stepper-teams-row {
+        width: auto;
+        justify-content: flex-start;
+    }
+    .stepper-action-row {
+        width: auto;
+        margin-left: auto;
+    }
+    .btn-stepper-save {
+        flex: 0 0 auto;
+        padding: 0 18px;
+    }
 }
 
 /* ==========================================================================
