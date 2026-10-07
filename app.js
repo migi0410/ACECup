@@ -1141,41 +1141,110 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const sortFn = (a, b) => {
-            // 1. Matches won
-            if (b.wins !== a.wins) return b.wins - a.wins;
+        // Group-based tiebreaker resolving BWF / standard tournament regulations
+        const rankPlayerList = (playerStats) => {
+            const winGroups = {};
+            playerStats.forEach(item => {
+                if (!winGroups[item.wins]) winGroups[item.wins] = [];
+                winGroups[item.wins].push(item);
+            });
 
-            // 2. Head-to-head (H2H)
-            if (h2h[a.p.id] && h2h[a.p.id][b.p.id] && h2h[a.p.id][b.p.id].matches > 0) {
-                const aWins = h2h[a.p.id][b.p.id].wins;
-                const bWins = h2h[b.p.id][a.p.id].wins;
-                if (aWins !== bWins) {
-                    if (aWins > bWins) a.h2hWonTiebreak = true;
-                    else b.h2hWonTiebreak = true;
-                    return bWins - aWins;
-                }
+            const sortedWinKeys = Object.keys(winGroups).map(Number).sort((a, b) => b - a);
+            let finalRanked = [];
 
-                const aDiff = h2h[a.p.id][b.p.id].diff;
-                const bDiff = h2h[b.p.id][a.p.id].diff;
-                if (aDiff !== bDiff) {
-                    if (aDiff > bDiff) a.h2hWonTiebreak = true;
-                    else b.h2hWonTiebreak = true;
-                    return bDiff - aDiff;
-                }
-            }
+            sortedWinKeys.forEach(winCount => {
+                const group = winGroups[winCount];
+                const resolved = resolveTieGroup(group);
+                finalRanked = finalRanked.concat(resolved);
+            });
 
-            // 3. Point difference (+/-)
-            if (b.diff !== a.diff) return b.diff - a.diff;
-
-            // 4. Total points scored
-            if (b.pts !== a.pts) return b.pts - a.pts;
-
-            // 5. Least losses
-            return a.losses - b.losses;
+            return finalRanked;
         };
 
-        const males = Object.values(stats).filter(s => s.p.logicalGender === 'M').sort(sortFn);
-        const females = Object.values(stats).filter(s => s.p.logicalGender === 'F').sort(sortFn);
+        const resolveTieGroup = (group) => {
+            if (group.length <= 1) return group;
+
+            // Exactly 2 players tied -> Direct Head-to-Head
+            if (group.length === 2) {
+                const a = group[0];
+                const b = group[1];
+                if (h2h[a.p.id] && h2h[a.p.id][b.p.id] && h2h[a.p.id][b.p.id].matches > 0) {
+                    const aWins = h2h[a.p.id][b.p.id].wins;
+                    const bWins = h2h[b.p.id][a.p.id].wins;
+                    if (aWins !== bWins) {
+                        if (aWins > bWins) {
+                            a.h2hWonTiebreak = true;
+                            return [a, b];
+                        } else {
+                            b.h2hWonTiebreak = true;
+                            return [b, a];
+                        }
+                    }
+                    const aH2HDiff = h2h[a.p.id][b.p.id].diff;
+                    const bH2HDiff = h2h[b.p.id][a.p.id].diff;
+                    if (aH2HDiff !== bH2HDiff) {
+                        if (aH2HDiff > bH2HDiff) {
+                            a.h2hWonTiebreak = true;
+                            return [a, b];
+                        } else {
+                            b.h2hWonTiebreak = true;
+                            return [b, a];
+                        }
+                    }
+                }
+                // Fallback to overall diff, pts, losses
+                if (b.diff !== a.diff) return b.diff > a.diff ? [b, a] : [a, b];
+                if (b.pts !== a.pts) return b.pts > a.pts ? [b, a] : [a, b];
+                return a.losses <= b.losses ? [a, b] : [b, a];
+            }
+
+            // 3 or more players tied: Check head-to-head mini-league
+            const miniWins = {};
+            const miniDiff = {};
+            group.forEach(g1 => {
+                miniWins[g1.p.id] = 0;
+                miniDiff[g1.p.id] = 0;
+                group.forEach(g2 => {
+                    if (g1.p.id !== g2.p.id && h2h[g1.p.id] && h2h[g1.p.id][g2.p.id]) {
+                        miniWins[g1.p.id] += h2h[g1.p.id][g2.p.id].wins;
+                        miniDiff[g1.p.id] += h2h[g1.p.id][g2.p.id].diff;
+                    }
+                });
+            });
+
+            const distinctMiniWins = new Set(Object.values(miniWins));
+            if (distinctMiniWins.size > 1) {
+                // Group by miniWins descending
+                const subGroups = {};
+                group.forEach(item => {
+                    const w = miniWins[item.p.id];
+                    if (!subGroups[w]) subGroups[w] = [];
+                    subGroups[w].push(item);
+                });
+                const sortedMiniKeys = Object.keys(subGroups).map(Number).sort((x, y) => y - x);
+                let subResult = [];
+                sortedMiniKeys.forEach(k => {
+                    const sub = subGroups[k];
+                    if (sub.length === 1 && sortedMiniKeys.length > 1) {
+                        sub[0].h2hWonTiebreak = true;
+                        subResult.push(sub[0]);
+                    } else {
+                        subResult = subResult.concat(resolveTieGroup(sub));
+                    }
+                });
+                return subResult;
+            }
+
+            // Circular tie (all mini-wins equal) -> Overall Diff (+/-), then Pts, then Losses
+            return [...group].sort((x, y) => {
+                if (y.diff !== x.diff) return y.diff - x.diff;
+                if (y.pts !== x.pts) return y.pts - x.pts;
+                return x.losses - y.losses;
+            });
+        };
+
+        const males = rankPlayerList(Object.values(stats).filter(s => s.p.logicalGender === 'M'));
+        const females = rankPlayerList(Object.values(stats).filter(s => s.p.logicalGender === 'F'));
 
         return { males, females };
     }
