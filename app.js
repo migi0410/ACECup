@@ -1338,29 +1338,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = `
             <div class="print-paper-header">
-                <h1>ACE CUP 2026 • LỊCH THI ĐẤU &amp; BIÊN BẢN ĐIỂM SỐ</h1>
+                <h1>ACE CUP 2026 • LỊCH THI ĐẤU</h1>
                 <div class="print-paper-meta">
-                    <span>📍 Địa điểm: Sân DE Badminton</span> &bull; 
+                    <span>📍 Sân DE Badminton</span> &bull; 
                     <span>📅 Ngày: <strong>${dateStr}</strong></span> &bull; 
-                    <span>🏸 Thể thức: Đôi Nam Nữ Giao Lưu (${totalMatches} trận)</span>
+                    <span>🏸 Tổng số: <strong>${totalMatches} trận</strong></span>
                 </div>
-            </div>
-
-            <div class="print-section-title">
-                ${isScoresheet ? '1. DANH SÁCH CÁC TRẬN ĐẤU &amp; PHIẾU CHẤM ĐIỂM TRỌNG TÀI' : '1. KẾT QUẢ CÁC TRẬN ĐẤU'}
             </div>
             
             <table class="print-paper-table">
                 <thead>
                     <tr>
-                        <th style="width: 38px;">STT</th>
-                        <th style="width: 45px;">Vòng</th>
-                        <th style="width: 50px;">Sân</th>
-                        <th style="width: 190px;">Đội 1 (Nam - Nữ)</th>
-                        <th style="width: 85px;">Tỷ Số</th>
-                        <th style="width: 190px;">Đội 2 (Nam - Nữ)</th>
-                        <th style="width: 80px;">Đội Thắng</th>
-                        <th style="width: 90px;">Ký Nhận</th>
+                        <th style="width: 45px;">Trận</th>
+                        <th style="width: 55px;">Vòng</th>
+                        <th style="width: 60px;">Sân</th>
+                        <th style="width: 230px; text-align: left; padding-left: 10px;">Đội 1 (Nam - Nữ)</th>
+                        <th style="width: 90px;">Tỷ Số</th>
+                        <th style="width: 230px; text-align: left; padding-left: 10px;">Đội 2 (Nam - Nữ)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1373,36 +1367,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 const t2 = `${m.team2.m.name} & ${m.team2.f.name}`;
                 
                 let scoreCol = '';
-                let winnerCol = '';
-                
                 if (isScoresheet) {
-                    scoreCol = `<span class="print-box-cell">&nbsp;</span> : <span class="print-box-cell">&nbsp;</span>`;
-                    winnerCol = `&nbsp;`;
+                    scoreCol = `<span class="print-box-cell">&nbsp;</span> - <span class="print-box-cell">&nbsp;</span>`;
                 } else {
                     if (m.isFinished) {
                         scoreCol = `<strong>${m.score1} - ${m.score2}</strong>`;
-                        winnerCol = m.score1 > m.score2 ? 'Đội 1' : (m.score2 > m.score1 ? 'Đội 2' : 'Hòa');
                     } else {
-                        scoreCol = `<span style="color: #888;">Chưa đấu</span>`;
-                        winnerCol = `-`;
+                        scoreCol = `<span style="color: #888;">-</span>`;
                     }
                 }
 
                 html += `
                     <tr>
                         <td><strong>${m.id}</strong></td>
-                        <td>V${m.round}</td>
+                        <td>Vòng ${m.round}</td>
                         <td>Sân ${court}</td>
-                        <td style="text-align: left; padding-left: 8px;">${t1}</td>
-                        <td>${scoreCol}</td>
-                        <td style="text-align: left; padding-left: 8px;">${t2}</td>
-                        <td><strong>${winnerCol}</strong></td>
-                        <td>&nbsp;</td>
+                        <td style="text-align: left; padding-left: 10px; font-weight: 600;">${t1}</td>
+                        <td style="font-size: 11pt;">${scoreCol}</td>
+                        <td style="text-align: left; padding-left: 10px; font-weight: 600;">${t2}</td>
                     </tr>
                 `;
             });
         } else {
-            html += `<tr><td colspan="8" style="padding: 16px;">Chưa có dữ liệu thi đấu</td></tr>`;
+            html += `<tr><td colspan="6" style="padding: 16px;">Chưa có dữ liệu thi đấu</td></tr>`;
         }
 
         html += `</tbody></table>`;
@@ -1424,7 +1411,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <th style="width: 50px;">Thua</th>
                                 <th style="width: 60px;">Hiệu Số</th>
                                 <th style="width: 60px;">Tổng Điểm</th>
-                                <th style="width: 70px;">H2H</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1439,7 +1425,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${row.losses}</td>
                             <td>${row.diff >= 0 ? '+' : ''}${row.diff}</td>
                             <td><strong>${row.pts}</strong></td>
-                            <td>${row.h2hWonTiebreak ? 'Ưu tiên' : '-'}</td>
                         </tr>
                     `;
                 });
@@ -1447,29 +1432,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return sec;
             };
 
-            html += renderTableSection('2. BẢNG XẾP HẠNG NAM', males);
-            html += renderTableSection('3. BẢNG XẾP HẠNG NỮ', females);
+            html += renderTableSection('BẢNG XẾP HẠNG NAM', males);
+            html += renderTableSection('BẢNG XẾP HẠNG NỮ', females);
         }
-
-        html += `
-            <div class="print-signatures-row">
-                <div class="sig-col">
-                    <strong>Đại Diện Vận Động Viên</strong>
-                    <div class="sig-line"></div>
-                    <span>(Ký &amp; ghi rõ họ tên)</span>
-                </div>
-                <div class="sig-col">
-                    <strong>Trọng Tài / Ban Tổ Chức</strong>
-                    <div class="sig-line"></div>
-                    <span>(Ký xác nhận biên bản)</span>
-                </div>
-            </div>
-
-            <div class="print-paper-footer">
-                <span>Hệ thống bốc thăm công bằng ACE Cup 2026 &bull; Tiêu chuẩn đối đầu trực tiếp H2H</span>
-                <span>Bản in lúc: ${new Date().toLocaleTimeString('vi-VN')} ngày ${dateStr}</span>
-            </div>
-        `;
 
         return html;
     }
